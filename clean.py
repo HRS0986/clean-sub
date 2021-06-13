@@ -9,11 +9,14 @@ class CleanSub:
         self.__sub_file_path = sub_file_path
         self.__extracted_sub_content: list[dict] = []
         self.__extracted_full_content: list[dict] = []
-        self.unwanted_content = []
+        self.__unwanted_content = []
         self.__content_to_write = []
 
     def __str__(self):
         pass
+
+    def get_unwanted(self) -> list[dict]:
+        return self.__unwanted_content
 
     def extract_subtitles(self) -> None:
         with open(self.__sub_file_path, 'r', encoding='utf8') as sub_file:
@@ -43,7 +46,7 @@ class CleanSub:
             sub_content = ' '.join(content['content'])
             for keyword in KEYWORDS:
                 if keyword in sub_content:
-                    self.unwanted_content.append(content)
+                    self.__unwanted_content.append(content)
                     break
             else:
                 after_content.append(content)
@@ -79,23 +82,19 @@ class CleanSub:
             end = split_timestamp['end']
             duration = self._calculate_duration(start, end)
             if duration <= MIN_DURATION:
-                self.unwanted_content.append(content)
+                self.__unwanted_content.append(content)
             elif duration >= MAX_DURATION:
-                self.unwanted_content.append(content)
+                self.__unwanted_content.append(content)
             else:
                 after_duration.append(content)
         self.__extracted_sub_content = after_duration
 
-    def remove_unwanted(self, content_numbers: tuple[int, ...]):
-        if content_numbers[0] == 0:
-            self.__content_to_write = self.__extracted_sub_content
-        else:
-            exclude_from_new: list[dict] = [self.unwanted_content[i-1] for i in content_numbers]
-            for content in self.__extracted_full_content:
-                if content in exclude_from_new:
-                    exclude_from_new.remove(content)
-                    continue
-                self.__content_to_write.append(content)
+    def remove_unwanted(self, content_to_remove: list[dict]):
+        for content in self.__extracted_full_content:
+            if content in content_to_remove:
+                content_to_remove.remove(content)
+                continue
+            self.__content_to_write.append(content)
 
     def create_new_sub_file(self) -> str:
         if CREATE_NEW_FILE:
@@ -104,7 +103,8 @@ class CleanSub:
             filename = self.__sub_file_path
 
         with open(filename, 'w', encoding='utf8') as sub_file:
-            for content in self.__content_to_write:
-                sub = f"{content['number']}\n{content['timestamp']}\n{content['content']}\n\n"
+            for i, content in enumerate(self.__content_to_write, 1):
+                sub_content = '\n'.join(content['content'])
+                sub = f"{i}\n{content['timestamp']}\n{sub_content}\n\n"
                 sub_file.write(sub)
         return filename
