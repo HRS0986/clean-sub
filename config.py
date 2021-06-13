@@ -7,8 +7,11 @@ MAX_DURATION = 7
 # Words to check in a subtitle
 KEYWORDS = (
     'උපසිරැසි',
+    'උපසිරසි',
+    'උපසිරස',
     'උපසිරැස',
     'පරිවර්තන අයිතිය සුරකින්න',
+    'ඉෂාන් කොම්',
     'SUBZLK',
     'subzlk',
     'SubzLK',
