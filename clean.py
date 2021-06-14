@@ -1,51 +1,53 @@
 import re
-from typing import Pattern
 from config import MIN_DURATION, MAX_DURATION, KEYWORDS, CREATE_NEW_FILE
 from abc import abstractmethod, ABC
+from typing import Dict, List, Tuple, Union, Pattern
+from dtypes import ContentList, SplitTimestamp, SRTSubPart, ASSSubPart, SRTRegexResults, ASSRegexResults
 
 
 class CleanSub(ABC):
     def __init__(self, sub_file_path: str, filetype: str):
         self._sub_file_path = sub_file_path
-        self._extracted_sub_content: list[dict] = []
-        self._extracted_full_content: list[dict] = []
-        self._unwanted_content = []
-        self._content_to_write = []
+        self._extracted_sub_content: ContentList = []
+        self._extracted_full_content: ContentList = []
+        self._unwanted_content: ContentList = []
+        self._content_to_write: ContentList = []
         self.filetype = filetype
 
-    def _calculate_duration(self, start: list[int], end: list[int]) -> float:
+    def _calculate_duration(self, start: List[int], end: List[int]) -> float:
         duration = 0.000
-        if end[-1] < start[-1]:
-            end[-1] += 1000
-            end[-2] -= 1
-        duration += (end[-1] - start[-1]) / 1000
-
-        if end[-2] < start[-2]:
-            end[-2] += 60
+        s_seconds = float(f"{start[-2]}.{start[-1]}")
+        e_seconds = float(f"{end[-2]}.{end[-1]}")
+        if e_seconds < s_seconds:
+            e_seconds += 60
             end[1] -= 1
-        duration += end[-2] - start[-2]
+        duration += e_seconds - s_seconds
         duration = float(f'{duration:.3f}')
         return duration
 
-    def _split_timestamp(self, timestamp: str) -> dict:
+    def _split_timestamp(self, timestamp: str) -> SplitTimestamp:
         start, end, sec_separator = '', '', ','
         if self.filetype == 'srt':
             start, end = timestamp.split(' --> ')
         elif self.filetype == 'ass':
             start, end = timestamp.split(',')
             sec_separator = '.'
+
         sh, sm, ss = start.split(':')
         ss, sms = ss.split(sec_separator)
         eh, em, es = end.split(':')
         es, ems = es.split(sec_separator)
-        return {'start': [int(sh), int(sm), int(ss), int(sms)], 'end': [int(eh), int(em), int(es), int(ems)]}
+        s_sec = float('.'.join((ss, sms)))
+        e_sec = float('.'.join((es, ems)))
 
-    def get_unwanted(self) -> list[dict]:
+        return {'start': [int(sh), int(sm), s_sec], 'end': [int(eh), int(em), e_sec]}
+
+    def get_unwanted(self) -> ContentList:
         return self._unwanted_content
 
     def detect_unwanted_by_content(self):
         # Check content has specific words
-        after_content = []
+        after_content: ContentList = []
         for content in self._extracted_sub_content:
             sub_content = ' '.join(content['content'])
             for keyword in KEYWORDS:
@@ -57,11 +59,11 @@ class CleanSub(ABC):
         self._extracted_sub_content = after_content
 
     def detect_unwanted_by_duration(self):
-        after_duration = []
+        after_duration: ContentList = []
         for content in self._extracted_sub_content:
-            split_timestamp: dict[str, list[int]] = self._split_timestamp(content['timestamp'])
-            start = split_timestamp['start']
-            end = split_timestamp['end']
+            split_timestamp: SplitTimestamp = self._split_timestamp(content['timestamp'])
+            start: List[Union[int, float]] = split_timestamp['start']
+            end: List[Union[int, float]] = split_timestamp['end']
             duration = self._calculate_duration(start, end)
             if duration <= MIN_DURATION:
                 self._unwanted_content.append(content)
@@ -71,7 +73,7 @@ class CleanSub(ABC):
                 after_duration.append(content)
         self._extracted_sub_content = after_duration
 
-    def remove_unwanted(self, content_to_remove: list[dict]):
+    def remove_unwanted(self, content_to_remove: ContentList):
         for content in self._extracted_full_content:
             if content in content_to_remove:
                 content_to_remove.remove(content)
@@ -96,13 +98,13 @@ class CleanSubSRT(CleanSub):
             sub_content: str = sub_file.read()
             SUB_PATTERN = r'([0-9]+\n.+(\n.+){1,})'
             REGEX: Pattern[str] = re.compile(SUB_PATTERN)
-            results: list[tuple] = REGEX.findall(sub_content)
+            results: SRTRegexResults = REGEX.findall(sub_content)
             for result_group in results:
-                lines = result_group[0].split('\n')
-                number = lines[0]
-                timestamp = lines[1]
-                sub = lines[2:]
-                sub_part = {
+                lines: List[str] = result_group[0].split('\n')
+                number: str = lines[0]
+                timestamp: str = lines[1]
+                sub: List[str] = lines[2:]
+                sub_part: SRTSubPart = {
                     'number': number,
                     'timestamp': timestamp,
                     'content': sub
@@ -127,18 +129,17 @@ class CleanSubSRT(CleanSub):
 class CleanSubASS(CleanSub):
     def __init__(self, sub_file_path: str):
         super(CleanSubASS, self).__init__(sub_file_path, 'ass')
-        self.info_content: list[str] = []
+        self.info_content: List[str] = []
 
     def extract_subtitles(self):
         with open(self._sub_file_path, 'r', encoding='utf8') as sub_file:
             sub_lines = sub_file.readlines()
             SUB_PATTERN = r'(D.+: \d,)(\d:\d\d:\d\d\.\d{2,3},\d:\d\d:\d\d\.\d{2,3})(,\w+,,\d,\d,\d,,)(.+)'
             REGEX: Pattern[str] = re.compile(SUB_PATTERN)
-            results: list[dict] = []
             for line in sub_lines:
                 if REGEX.match(line):
-                    content = REGEX.findall(line)[0]
-                    sub_part = {
+                    content: ASSRegexResults = REGEX.findall(line)[0]
+                    sub_part: ASSSubPart = {
                         "part_1": content[0],
                         "timestamp": content[1],
                         "part_2": content[2],
