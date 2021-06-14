@@ -40,22 +40,13 @@ class CleanSub(ABC):
         es, ems = es.split(sec_separator)
         return {'start': [int(sh), int(sm), int(ss), int(sms)], 'end': [int(eh), int(em), int(es), int(ems)]}
 
-    def remove_unwanted(self, content_to_remove: list[dict]):
-        for content in self._extracted_full_content:
-            if content in content_to_remove:
-                content_to_remove.remove(content)
-                continue
-            self._content_to_write.append(content)
-
     def get_unwanted(self) -> list[dict]:
         return self._unwanted_content
 
     def detect_unwanted_by_content(self):
         # Check content has specific words
         after_content = []
-        i = 0
         for content in self._extracted_sub_content:
-            i += 1
             sub_content = ' '.join(content['content'])
             for keyword in KEYWORDS:
                 if keyword in sub_content:
@@ -79,6 +70,13 @@ class CleanSub(ABC):
             else:
                 after_duration.append(content)
         self._extracted_sub_content = after_duration
+
+    def remove_unwanted(self, content_to_remove: list[dict]):
+        for content in self._extracted_full_content:
+            if content in content_to_remove:
+                content_to_remove.remove(content)
+                continue
+            self._content_to_write.append(content)
 
     @abstractmethod
     def extract_subtitles(self):
