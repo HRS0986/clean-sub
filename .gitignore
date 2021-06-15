@@ -5,8 +5,8 @@
 
 # Node artifact files
 node_modules/
-dist/
 __pycache__/
+build/
 SUB/
 .mypy_cache/
 
@@ -39,7 +39,6 @@ Thumbs.db
 
 # Applications
 *.app
-*.exe
 *.war
 
 # Large media files
@@ -57,3 +56,4 @@ Thumbs.db
 *.ass
 
 scratch.py
+*.spec
