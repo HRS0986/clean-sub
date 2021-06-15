@@ -1,7 +1,7 @@
 import re
 from config import MIN_DURATION, MAX_DURATION, KEYWORDS, CREATE_NEW_FILE
 from abc import abstractmethod, ABC
-from typing import Dict, List, Tuple, Union, Pattern
+from typing import List, Union, Pattern
 from dtypes import ContentList, SplitTimestamp, SRTSubPart, ASSSubPart, SRTRegexResults, ASSRegexResults
 
 
@@ -14,10 +14,11 @@ class CleanSub(ABC):
         self._content_to_write: ContentList = []
         self.filetype = filetype
 
+    # FIXME: Fix the calculation algorithm
     def _calculate_duration(self, start: List[int], end: List[int]) -> float:
         duration = 0.000
-        s_seconds = float(f"{start[-2]}.{start[-1]}")
-        e_seconds = float(f"{end[-2]}.{end[-1]}")
+        s_seconds = start[-1]
+        e_seconds = end[-1]
         if e_seconds < s_seconds:
             e_seconds += 60
             end[1] -= 1
