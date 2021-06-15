@@ -8,6 +8,7 @@ node_modules/
 dist/
 __pycache__/
 SUB/
+.mypy_cache/
 
 # Compiled Java class files
 *.class
