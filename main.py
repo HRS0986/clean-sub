@@ -1,7 +1,9 @@
 from PyInquirer import prompt, Validator, ValidationError
 import os
+from dtypes import ContentList
 # from pprint import pprint
-from clean import CleanSub
+from clean import CleanSubSRT, CleanSubASS
+from typing import Union
 # from colorama import init, Fore
 
 # init(convert=True)
@@ -10,9 +12,10 @@ from clean import CleanSub
 class PathValidator(Validator):
     def validate(self, document):
         valid_path = os.path.isfile(document.text)
-        if not valid_path:
+        valid_type = document.text[-3:] in ('srt', 'ass')
+        if not valid_path and valid_type:
             raise ValidationError(
-                message="Invalid path. Please enter valid path",
+                message="Invalid file. Please enter valid file path",
                 cursor_position=len(document.text)
             )
 
@@ -25,9 +28,15 @@ question_1 = {
 }
 
 answer = prompt(question_1)
-sub_file_path = answer['sub_file_path']
+sub_file_path: str = answer['sub_file_path']
+filetype = sub_file_path[-3:]
 
-cleaner = CleanSub(sub_file_path)
+cleaner: Union[CleanSubASS, CleanSubSRT]
+if filetype == "srt":
+    cleaner = CleanSubSRT(sub_file_path)
+else:
+    cleaner = CleanSubASS(sub_file_path)
+
 cleaner.extract_subtitles()
 cleaner.detect_unwanted_by_content()
 cleaner.detect_unwanted_by_duration()
@@ -39,15 +48,15 @@ question_2 = {
     "message": "Select what to remove:",
     "choices": [
         {
-            "name": f"{content['timestamp']} :- {','.join(content['content'])}",
+            "name": f"{sub['timestamp']} :- {','.join(sub['content']) if filetype == 'srt' else sub['content']}",
             "checked": True
-        } for content in unwanted_content
+        } for sub in unwanted_content
     ],
 }
 
 answers = prompt(question_2)['unwanted']
 
-to_remove: list[dict] = []
+to_remove: ContentList = []
 for answer in answers:
     timestamp = answer.split(' :- ')[0]
     for content in unwanted_content:

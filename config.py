@@ -34,4 +34,4 @@ KEYWORDS = (
 )
 
 # Create new subtitle file or modify the current subtitle file
-CREATE_NEW_FILE = True
+CREATE_NEW_FILE = False
