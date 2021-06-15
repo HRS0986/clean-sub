@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 pyinquirer = "*"
 colorama = "*"
+pyinstaller = "*"
 
 [dev-packages]
 mypy = "*"
