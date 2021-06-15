@@ -1,7 +1,9 @@
 from PyInquirer import prompt, Validator, ValidationError
 import os
+from dtypes import ContentList
 # from pprint import pprint
 from clean import CleanSubSRT, CleanSubASS
+from typing import Union
 # from colorama import init, Fore
 
 # init(convert=True)
@@ -26,9 +28,10 @@ question_1 = {
 }
 
 answer = prompt(question_1)
-sub_file_path = answer['sub_file_path']
+sub_file_path: str = answer['sub_file_path']
 filetype = sub_file_path[-3:]
 
+cleaner: Union[CleanSubASS, CleanSubSRT]
 if filetype == "srt":
     cleaner = CleanSubSRT(sub_file_path)
 else:
@@ -53,7 +56,7 @@ question_2 = {
 
 answers = prompt(question_2)['unwanted']
 
-to_remove: list[dict] = []
+to_remove: ContentList = []
 for answer in answers:
     timestamp = answer.split(' :- ')[0]
     for content in unwanted_content:
