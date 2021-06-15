@@ -14,15 +14,22 @@ class CleanSub(ABC):
         self._content_to_write: ContentList = []
         self.filetype = filetype
 
-    # FIXME: Fix the calculation algorithm
     def _calculate_duration(self, start: List[int], end: List[int]) -> float:
         duration = 0.000
-        s_seconds = start[-1]
-        e_seconds = end[-1]
+        s_seconds, s_minutes, s_hours = start[-1], start[1], start[0]
+        e_seconds, e_minutes, e_hours = end[-1], end[1], end[0]
+
         if e_seconds < s_seconds:
             e_seconds += 60
-            end[1] -= 1
+            e_minutes -= 1
+        if e_minutes < s_minutes:
+            e_minutes += 60
+            e_hours -= 1
+
         duration += e_seconds - s_seconds
+        duration += (e_minutes - s_minutes) * 60
+        duration += (e_hours - s_hours) * 60 * 60
+
         duration = float(f'{duration:.3f}')
         return duration
 
