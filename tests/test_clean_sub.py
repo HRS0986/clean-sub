@@ -43,15 +43,27 @@ class TestCleanSub(unittest.TestCase):
     def test_detect_by_duration(self) -> None:
         self.cleaner_srt._extracted_sub_content = MOCK_DATA['srt_timestamp']
         self.cleaner_srt.detect_unwanted_by_duration()
-        expected_content = MOCK_DATA['srt_timestamp_expected_duration']
-        self.assertEqual(expected_content, self.cleaner_srt._extracted_sub_content, msg="Test Detect By Display Duration Of A Subtitle")
+        expected_to_write = MOCK_DATA['srt_content_to_write']
+        expected_removed = MOCK_DATA['srt_timestamp_expected_duration']
+        removed_count = len(self.cleaner_srt._unwanted_content)
+        write_count = len(self.cleaner_srt._extracted_sub_content)
+        for content in expected_removed:
+            self.assertIn(content, self.cleaner_srt._unwanted_content, msg="Test Removed Contents By Duration")
+        for content in expected_to_write:
+            self.assertIn(content, self.cleaner_srt._extracted_sub_content, msg="Test Contents After Removed")
+        self.assertEqual(len(expected_removed), removed_count, msg="Test Removed Content Count")
+        self.assertEqual(len(expected_to_write), write_count, msg="Test To Write Content Count")
 
     def test_remove_unwanted(self) -> None:
         expected_content = MOCK_DATA['srt_content_to_write']
         to_remove = MOCK_DATA['srt_timestamp_expected_duration']
-        self._extracted_full_content = MOCK_DATA['srt_content']
+        self.cleaner_srt._extracted_full_content = MOCK_DATA['srt_timestamp']
         self.cleaner_srt.remove_unwanted(to_remove)
-        self.assertEqual(expected_content, self.cleaner_srt._content_to_write, msg="Test Remove Unwanted Content")
+        expected_count = len(expected_content)
+        actual_count = len(self.cleaner_srt._content_to_write)
+        for content in expected_content:
+            self.assertIn(content, self.cleaner_srt._content_to_write, msg="Test Remove Unwanted Content")
+        self.assertEqual(expected_count, actual_count, msg="Test Remove Unwanted Content Count")
 
 
 if __name__ == '__main__':
