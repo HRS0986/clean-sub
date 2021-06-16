@@ -57,7 +57,7 @@ class CleanSub(ABC):
         # Check content has specific words
         after_content: ContentList = []
         for content in self._extracted_sub_content:
-            sub_content = ' '.join(content['content']) if self.filetype == 'srt' else content
+            sub_content = ' '.join(content['content']) if self.filetype == 'srt' else content['content']
             for keyword in KEYWORDS:
                 if keyword in sub_content:
                     self._unwanted_content.append(content)
