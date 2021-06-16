@@ -6,6 +6,7 @@
 # Node artifact files
 node_modules/
 dist/
+build/
 __pycache__/
 SUB/
 .mypy_cache/
@@ -57,3 +58,4 @@ Thumbs.db
 *.ass
 
 scratch.py
+*.spec
