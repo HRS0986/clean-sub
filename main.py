@@ -4,9 +4,12 @@ from dtypes import ContentList
 # from pprint import pprint
 from clean import CleanSubSRT, CleanSubASS
 from typing import Union
-# from colorama import init, Fore
+from colorama import init, Fore
 
-# init(convert=True)
+if os.name == "posix":
+    init()
+elif os.name == 'nt':
+    init(convert=True)
 
 
 class PathValidator(Validator):
@@ -29,6 +32,7 @@ question_1 = {
 
 answer = prompt(question_1)
 sub_file_path: str = answer['sub_file_path'].strip('"')
+sub_file_path: str = answer['sub_file_path'].strip("'")
 filetype = sub_file_path[-3:]
 
 cleaner: Union[CleanSubASS, CleanSubSRT]
@@ -38,33 +42,36 @@ else:
     cleaner = CleanSubASS(sub_file_path)
 
 cleaner.extract_subtitles()
-cleaner.detect_unwanted_by_content()
+# cleaner.detect_unwanted_by_content()
 cleaner.detect_unwanted_by_duration()
 unwanted_content = cleaner.get_unwanted()
 
-question_2 = {
-    "type": "checkbox",
-    "name": "unwanted",
-    "message": "Select what to remove:",
-    "choices": [
-        {
-            "name": f"{sub['timestamp']} :- {','.join(sub['content']) if filetype == 'srt' else sub['content']}",
-            "checked": True
-        } for sub in unwanted_content
-    ],
-}
+if (len(unwanted_content)) != 0:
+    question_2 = {
+        "type": "checkbox",
+        "name": "unwanted",
+        "message": "Select what to remove:",
+        "choices": [
+            {
+                "name": f"{sub['timestamp']} :- {','.join(sub['content']) if filetype == 'srt' else sub['content']}",
+                "checked": True
+            } for sub in unwanted_content
+        ],
+    }
+    answers = prompt(question_2)['unwanted']
 
-answers = prompt(question_2)['unwanted']
+    to_remove: ContentList = []
+    for answer in answers:
+        timestamp = answer.split(' :- ')[0]
+        for content in unwanted_content:
+            if content['timestamp'] == timestamp:
+                to_remove.append(content)
+                break
 
-to_remove: ContentList = []
-for answer in answers:
-    timestamp = answer.split(' :- ')[0]
-    for content in unwanted_content:
-        if content['timestamp'] == timestamp:
-            to_remove.append(content)
-            break
+    cleaner.remove_unwanted(to_remove)
+    filename: str = cleaner.create_new_sub_file()
+    print(f"File Saved To {filename}")
 
-cleaner.remove_unwanted(to_remove)
-filename: str = cleaner.create_new_sub_file()
-print(f"File Saved To {filename}")
+else:
+    print(Fore.LIGHTYELLOW_EX + 'Nothing To Remove In This Subtitle File' + Fore.RESET)
 
