@@ -28,7 +28,7 @@ question_1 = {
 }
 
 answer = prompt(question_1)
-sub_file_path: str = answer['sub_file_path']
+sub_file_path: str = answer['sub_file_path'].strip('"')
 filetype = sub_file_path[-3:]
 
 cleaner: Union[CleanSubASS, CleanSubSRT]
