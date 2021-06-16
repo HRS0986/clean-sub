@@ -70,7 +70,7 @@ if (len(unwanted_content)) != 0:
 
     cleaner.remove_unwanted(to_remove)
     filename: str = cleaner.create_new_sub_file()
-    print(f"File Saved To {filename}")
+    print(Fore.BLUE + f"\n --> File Saved To {filename}\n" + Fore.RESET)
 
 else:
     print(Fore.LIGHTYELLOW_EX + 'Nothing To Remove In This Subtitle File' + Fore.RESET)
