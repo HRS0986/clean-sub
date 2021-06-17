@@ -1,5 +1,5 @@
 import re
-from config import MIN_DURATION, MAX_DURATION, KEYWORDS, CREATE_NEW_FILE
+from config import MIN_DURATION, MAX_DURATION, KEYWORDS, CREATE_NEW_FILE, REMOVE_EMPTY
 from abc import abstractmethod, ABC
 from typing import List, Union, Pattern
 from dtypes import ContentList, SplitTimestamp, SRTSubPart, ASSSubPart, SRTRegexResults, ASSRegexResults
@@ -54,7 +54,6 @@ class CleanSub(ABC):
         return self._unwanted_content
 
     def detect_unwanted_by_content(self):
-        # Check content has specific words
         after_content: ContentList = []
         for content in self._extracted_sub_content:
             sub_content = ' '.join(content['content']) if self.filetype == 'srt' else content['content']
@@ -142,7 +141,7 @@ class CleanSubASS(CleanSub):
     def extract_subtitles(self):
         with open(self._sub_file_path, 'r', encoding='utf8') as sub_file:
             sub_lines = sub_file.readlines()
-            SUB_PATTERN = r'(D.+: \d,)(\d:\d\d:\d\d\.\d{2,3},\d:\d\d:\d\d\.\d{2,3})(,\w+,,\d,\d,\d,,)(.+)'
+            SUB_PATTERN = r'(D.+: \d,)(\d:\d\d:\d\d\.\d{2,3},\d:\d\d:\d\d\.\d{2,3})(,\w+,.*,\d,\d,\d,.*,)(.+)'
             REGEX: Pattern[str] = re.compile(SUB_PATTERN)
             for line in sub_lines:
                 if REGEX.match(line):
@@ -155,7 +154,20 @@ class CleanSubASS(CleanSub):
                     }
                     self._extracted_sub_content.append(sub_part)
                 else:
-                    self.info_content.append(line)
+                    EMPTY_PATTERN = r'(D.+: \d,)(\d:\d\d:\d\d\.\d{2,3},\d:\d\d:\d\d\.\d{2,3})(,\w+,.*,\d,\d,\d,.*,)$'
+                    REGEX_2: Pattern[str] = re.compile(EMPTY_PATTERN)
+                    if REGEX_2.match(line):
+                        if not REMOVE_EMPTY:
+                            content: ASSRegexResults = REGEX_2.findall(line)[0]
+                            sub_part: ASSSubPart = {
+                                "part_1": content[0],
+                                "timestamp": content[1],
+                                "part_2": content[2],
+                                "content": ''
+                            }
+                            self._extracted_sub_content.append(sub_part)
+                    else:
+                        self.info_content.append(line)
             self._extracted_full_content = self._extracted_sub_content
 
     def create_new_sub_file(self) -> str:
