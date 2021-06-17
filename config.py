@@ -31,9 +31,12 @@ KEYWORDS = (
     'BaiscopeLk.com',
     'www.',
     'WWW.',
-    '{\pos',
-    '{\c&H',
+    '\pos',
+    'c&H',
 )
 
 # Create new subtitle file or modify the current subtitle file
 CREATE_NEW_FILE = False
+
+# Remove Empty Subtitle Lines
+REMOVE_EMPTY = True
