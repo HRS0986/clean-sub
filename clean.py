@@ -138,7 +138,7 @@ class CleanSubASS(CleanSub):
         super(CleanSubASS, self).__init__(sub_file_path, 'ass')
         self.info_content: List[str] = []
 
-    def extract_subtitles(self):
+    def extract_subtitles(self, remove_empty: bool=REMOVE_EMPTY):
         with open(self._sub_file_path, 'r', encoding='utf8') as sub_file:
             sub_lines = sub_file.readlines()
             SUB_PATTERN = r'(D.+: \d,)(\d:\d\d:\d\d\.\d{2,3},\d:\d\d:\d\d\.\d{2,3})(,\w+,.*,\d,\d,\d,.*,)(.+)'
@@ -157,7 +157,7 @@ class CleanSubASS(CleanSub):
                     EMPTY_PATTERN = r'(D.+: \d,)(\d:\d\d:\d\d\.\d{2,3},\d:\d\d:\d\d\.\d{2,3})(,\w+,.*,\d,\d,\d,.*,)$'
                     REGEX_2: Pattern[str] = re.compile(EMPTY_PATTERN)
                     if REGEX_2.match(line):
-                        if not REMOVE_EMPTY:
+                        if not remove_empty:
                             content: ASSRegexResults = REGEX_2.findall(line)[0]
                             sub_part: ASSSubPart = {
                                 "part_1": content[0],

@@ -38,5 +38,5 @@ KEYWORDS = (
 # Create new subtitle file or modify the current subtitle file
 CREATE_NEW_FILE = False
 
-# Remove Empty Subtitle Lines
+# Remove Empty Subtitle Lines. Only For .ass Files
 REMOVE_EMPTY = True
