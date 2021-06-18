@@ -73,5 +73,5 @@ if (len(unwanted_content)) != 0:
     print(Fore.BLUE + f"\n --> File Saved To {filename}\n" + Fore.RESET)
 
 else:
-    print(Fore.LIGHTYELLOW_EX + 'Nothing To Remove In This Subtitle File' + Fore.RESET)
+    print(Fore.LIGHTYELLOW_EX + '\n --> Nothing To Remove In This Subtitle File\n' + Fore.RESET)
 
