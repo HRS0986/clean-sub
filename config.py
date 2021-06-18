@@ -33,6 +33,7 @@ KEYWORDS = (
     'WWW.',
     '\pos',
     'c&H',
+    '<font color=',
 )
 
 # Create new subtitle file or modify the current subtitle file
