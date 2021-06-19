@@ -178,7 +178,7 @@ class CleanSubASS(CleanSub):
 
         with open(filename, 'w', encoding='utf8') as sub_file:
             for info in self._info_content:
-                sub_file.write(info)
+                sub_file.write(info + '\n')
 
             for content in self._content_to_write:
                 sub = f"{content['part_1']}{content['timestamp']}{content['part_2']}{content['content']}\n"
