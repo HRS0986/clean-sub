@@ -188,11 +188,19 @@ class CleanSubASS(CleanSub):
     def remove_graphics_and_fonts(self):
         GRAPHICS_PTN = r'\[Graphics\]\n(.+\n)*'
         FONTS_PTN = r'\[Fonts\]\n(.+\n)*'
-        GRAPHICS_REGEX = re.compile(GRAPHICS_PTN)
-        FONTS_REGEX = re.compile(FONTS_PTN)
+        GRAPHICS_REGEX: Pattern[str] = re.compile(GRAPHICS_PTN)
+        FONTS_REGEX: Pattern[str] = re.compile(FONTS_PTN)
         info_str: str = ''.join(self._info_content)
 
         if GRAPHICS_REGEX.search(info_str):
             info_str = GRAPHICS_REGEX.sub("", info_str)
         if FONTS_REGEX.search(info_str):
             info_str = FONTS_REGEX.sub("", info_str)
+
+        info: List[str] = info_str.split('\n')
+        for line in info[::-1]:
+            if len(line) == 0:
+                info.pop()
+            else:
+                break
+        self._info_content = info
