@@ -41,6 +41,7 @@ else:
     cleaner = CleanSubASS(sub_file_path)
 
 cleaner.extract_subtitles()
+cleaner.remove_graphics_and_fonts()
 cleaner.detect_unwanted_by_content()
 cleaner.detect_unwanted_by_duration()
 unwanted_content = cleaner.get_unwanted()
