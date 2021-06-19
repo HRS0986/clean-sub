@@ -1,7 +1,6 @@
 from PyInquirer import prompt, Validator, ValidationError
 import os
 from dtypes import ContentList
-# from pprint import pprint
 from clean import CleanSubSRT, CleanSubASS
 from typing import Union
 from colorama import init, Fore
@@ -32,7 +31,7 @@ question_1 = {
 
 answer = prompt(question_1)
 sub_file_path: str = answer['sub_file_path'].strip('"')
-sub_file_path: str = answer['sub_file_path'].strip("'")
+sub_file_path = sub_file_path.strip("' ")
 filetype = sub_file_path[-3:]
 
 cleaner: Union[CleanSubASS, CleanSubSRT]
@@ -66,6 +65,7 @@ if (len(unwanted_content)) != 0:
         for content in unwanted_content:
             if content['timestamp'] == timestamp:
                 to_remove.append(content)
+                unwanted_content.remove(content)
                 break
 
     cleaner.remove_unwanted(to_remove)
