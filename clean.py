@@ -138,10 +138,10 @@ class CleanSubASS(CleanSub):
         super(CleanSubASS, self).__init__(sub_file_path, 'ass')
         self.info_content: List[str] = []
 
-    def extract_subtitles(self, remove_empty: bool=REMOVE_EMPTY):
+    def extract_subtitles(self, remove_empty: bool = REMOVE_EMPTY):
         with open(self._sub_file_path, 'r', encoding='utf8') as sub_file:
             sub_lines = sub_file.readlines()
-            SUB_PATTERN = r'(D.+: \d,)(\d:\d\d:\d\d\.\d{2,3},\d:\d\d:\d\d\.\d{2,3})(,\w+,.*,\d,\d,\d,.*,)(.+)'
+            SUB_PATTERN = r'(D.+: \d,)(\d:\d\d:\d\d\.\d{2,3},\d:\d\d:\d\d\.\d{2,3})(,\w+,.*,\d,\d,\d,.*?,)(.+)'
             REGEX: Pattern[str] = re.compile(SUB_PATTERN)
             for line in sub_lines:
                 if REGEX.match(line):
