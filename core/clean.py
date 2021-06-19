@@ -1,8 +1,8 @@
 import re
-from config import MIN_DURATION, MAX_DURATION, KEYWORDS, CREATE_NEW_FILE, REMOVE_EMPTY
+from .config import MIN_DURATION, MAX_DURATION, KEYWORDS, CREATE_NEW_FILE, REMOVE_EMPTY
 from abc import abstractmethod, ABC
 from typing import List, Union, Pattern
-from dtypes import ContentList, SplitTimestamp, SRTSubPart, ASSSubPart, SRTRegexResults, ASSRegexResults
+from .dtypes import ContentList, SplitTimestamp, SRTSubPart, ASSSubPart, SRTRegexResults, ASSRegexResults
 
 
 class CleanSub(ABC):
