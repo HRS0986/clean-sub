@@ -136,7 +136,7 @@ class CleanSubSRT(CleanSub):
 class CleanSubASS(CleanSub):
     def __init__(self, sub_file_path: str):
         super(CleanSubASS, self).__init__(sub_file_path, 'ass')
-        self.info_content: List[str] = []
+        self._info_content: List[str] = []
 
     def extract_subtitles(self, remove_empty: bool = REMOVE_EMPTY):
         with open(self._sub_file_path, 'r', encoding='utf8') as sub_file:
@@ -167,7 +167,7 @@ class CleanSubASS(CleanSub):
                             }
                             self._extracted_sub_content.append(sub_part)
                     else:
-                        self.info_content.append(line)
+                        self._info_content.append(line)
             self._extracted_full_content = self._extracted_sub_content
 
     def create_new_sub_file(self) -> str:
@@ -177,10 +177,22 @@ class CleanSubASS(CleanSub):
             filename = self._sub_file_path
 
         with open(filename, 'w', encoding='utf8') as sub_file:
-            for info in self.info_content:
+            for info in self._info_content:
                 sub_file.write(info)
 
             for content in self._content_to_write:
                 sub = f"{content['part_1']}{content['timestamp']}{content['part_2']}{content['content']}\n"
                 sub_file.write(sub)
         return filename
+
+    def remove_graphics_and_fonts(self):
+        GRAPHICS_PTN = r'\[Graphics\]\n(.+\n)*'
+        FONTS_PTN = r'\[Fonts\]\n(.+\n)*'
+        GRAPHICS_REGEX = re.compile(GRAPHICS_PTN)
+        FONTS_REGEX = re.compile(FONTS_PTN)
+        info_str: str = ''.join(self._info_content)
+
+        if GRAPHICS_REGEX.search(info_str):
+            info_str = GRAPHICS_REGEX.sub("", info_str)
+        if FONTS_REGEX.search(info_str):
+            info_str = FONTS_REGEX.sub("", info_str)
