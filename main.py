@@ -1,9 +1,9 @@
-from PyInquirer import prompt, Validator, ValidationError
 import os
-from dtypes import ContentList
-from clean import CleanSubSRT, CleanSubASS
 from typing import Union
 from colorama import init, Fore
+from PyInquirer import prompt, Validator, ValidationError
+from core.dtypes import ContentList
+from core.clean import CleanSubSRT, CleanSubASS
 
 if os.name == "posix":
     init()
