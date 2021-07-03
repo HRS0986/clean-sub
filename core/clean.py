@@ -1,8 +1,8 @@
 import re
-from config import MIN_DURATION, MAX_DURATION, KEYWORDS, CREATE_NEW_FILE
+from .config import MIN_DURATION, MAX_DURATION, KEYWORDS, CREATE_NEW_FILE, REMOVE_EMPTY
 from abc import abstractmethod, ABC
 from typing import List, Union, Pattern
-from dtypes import ContentList, SplitTimestamp, SRTSubPart, ASSSubPart, SRTRegexResults, ASSRegexResults
+from .dtypes import ContentList, SplitTimestamp, SRTSubPart, ASSSubPart, SRTRegexResults, ASSRegexResults
 
 
 class CleanSub(ABC):
@@ -54,10 +54,9 @@ class CleanSub(ABC):
         return self._unwanted_content
 
     def detect_unwanted_by_content(self):
-        # Check content has specific words
         after_content: ContentList = []
         for content in self._extracted_sub_content:
-            sub_content = ' '.join(content['content'])
+            sub_content = ' '.join(content['content']) if self.filetype == 'srt' else content['content']
             for keyword in KEYWORDS:
                 if keyword in sub_content:
                     self._unwanted_content.append(content)
@@ -137,12 +136,12 @@ class CleanSubSRT(CleanSub):
 class CleanSubASS(CleanSub):
     def __init__(self, sub_file_path: str):
         super(CleanSubASS, self).__init__(sub_file_path, 'ass')
-        self.info_content: List[str] = []
+        self._info_content: List[str] = []
 
-    def extract_subtitles(self):
+    def extract_subtitles(self, remove_empty: bool = REMOVE_EMPTY):
         with open(self._sub_file_path, 'r', encoding='utf8') as sub_file:
             sub_lines = sub_file.readlines()
-            SUB_PATTERN = r'(D.+: \d,)(\d:\d\d:\d\d\.\d{2,3},\d:\d\d:\d\d\.\d{2,3})(,\w+,,\d,\d,\d,,)(.+)'
+            SUB_PATTERN = r'(D.+: \d,)(\d:\d\d:\d\d\.\d{2,3},\d:\d\d:\d\d\.\d{2,3})(,\w+,.*,\d,\d,\d,.*?,)(.+)'
             REGEX: Pattern[str] = re.compile(SUB_PATTERN)
             for line in sub_lines:
                 if REGEX.match(line):
@@ -155,7 +154,20 @@ class CleanSubASS(CleanSub):
                     }
                     self._extracted_sub_content.append(sub_part)
                 else:
-                    self.info_content.append(line)
+                    EMPTY_PATTERN = r'(D.+: \d,)(\d:\d\d:\d\d\.\d{2,3},\d:\d\d:\d\d\.\d{2,3})(,\w+,.*,\d,\d,\d,.*,)$'
+                    REGEX_2: Pattern[str] = re.compile(EMPTY_PATTERN)
+                    if REGEX_2.match(line):
+                        if not remove_empty:
+                            content: ASSRegexResults = REGEX_2.findall(line)[0]
+                            sub_part: ASSSubPart = {
+                                "part_1": content[0],
+                                "timestamp": content[1],
+                                "part_2": content[2],
+                                "content": ''
+                            }
+                            self._extracted_sub_content.append(sub_part)
+                    else:
+                        self._info_content.append(line)
             self._extracted_full_content = self._extracted_sub_content
 
     def create_new_sub_file(self) -> str:
@@ -165,10 +177,30 @@ class CleanSubASS(CleanSub):
             filename = self._sub_file_path
 
         with open(filename, 'w', encoding='utf8') as sub_file:
-            for info in self.info_content:
-                sub_file.write(info)
+            for info in self._info_content:
+                sub_file.write(info + '\n')
 
             for content in self._content_to_write:
                 sub = f"{content['part_1']}{content['timestamp']}{content['part_2']}{content['content']}\n"
                 sub_file.write(sub)
         return filename
+
+    def remove_graphics_and_fonts(self):
+        GRAPHICS_PTN = r'\[Graphics\]\n(.+\n)*'
+        FONTS_PTN = r'\[Fonts\]\n(.+\n)*'
+        GRAPHICS_REGEX: Pattern[str] = re.compile(GRAPHICS_PTN)
+        FONTS_REGEX: Pattern[str] = re.compile(FONTS_PTN)
+        info_str: str = ''.join(self._info_content)
+
+        if GRAPHICS_REGEX.search(info_str):
+            info_str = GRAPHICS_REGEX.sub("", info_str)
+        if FONTS_REGEX.search(info_str):
+            info_str = FONTS_REGEX.sub("", info_str)
+
+        info: List[str] = info_str.split('\n')
+        for line in info[::-1]:
+            if len(line) == 0:
+                info.pop()
+            else:
+                break
+        self._info_content = info
