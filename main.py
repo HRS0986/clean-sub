@@ -41,7 +41,7 @@ else:
     cleaner = CleanSubASS(sub_file_path)
 
 cleaner.extract_subtitles()
-if filetype =='ass':
+if filetype == 'ass':
     cleaner.remove_graphics_and_fonts()
 cleaner.detect_unwanted_by_content()
 cleaner.detect_unwanted_by_duration()
@@ -76,4 +76,3 @@ if (len(unwanted_content)) != 0:
 
 else:
     print(Fore.LIGHTYELLOW_EX + '\n --> Nothing To Remove In This Subtitle File\n' + Fore.RESET)
-
