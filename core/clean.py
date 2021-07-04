@@ -1,18 +1,20 @@
 import re
 from .config import MIN_DURATION, MAX_DURATION, KEYWORDS, CREATE_NEW_FILE, REMOVE_EMPTY
 from abc import abstractmethod, ABC
-from typing import List, Union, Pattern
+from typing import List, Union, Pattern, Dict
 from .dtypes import ContentList, SplitTimestamp, SRTSubPart, ASSSubPart, SRTRegexResults, ASSRegexResults
 
 
 class CleanSub(ABC):
-    def __init__(self, sub_file_path: str, filetype: str):
+    def __init__(self, sub_file_path: str, filetype: str, content_ptn: str):
         self._sub_file_path = sub_file_path
         self._extracted_sub_content: ContentList = []
         self._extracted_full_content: ContentList = []
         self._unwanted_content: ContentList = []
         self._content_to_write: ContentList = []
         self.filetype = filetype
+        self.__CONTENT_PTN = content_ptn
+        self.__CONTENT_REGEX: Pattern[str] = re.compile(self.__CONTENT_PTN)
 
     def _calculate_duration(self, start: List[int], end: List[int]) -> float:
         duration = 0.000
@@ -98,14 +100,13 @@ class CleanSub(ABC):
 
 class CleanSubSRT(CleanSub):
     def __init__(self, sub_file_path: str):
-        super(CleanSubSRT, self).__init__(sub_file_path, 'srt')
+        SRT_CONTENT_PTN = r'([0-9]+\n.+(\n.+){1,})'
+        super(CleanSubSRT, self).__init__(sub_file_path, 'srt', SRT_CONTENT_PTN)
 
     def extract_subtitles(self) -> None:
         with open(self._sub_file_path, 'r', encoding='utf8') as sub_file:
             sub_content: str = sub_file.read()
-            SUB_PATTERN = r'([0-9]+\n.+(\n.+){1,})'
-            REGEX: Pattern[str] = re.compile(SUB_PATTERN)
-            results: SRTRegexResults = REGEX.findall(sub_content)
+            results: SRTRegexResults = self.__CONTENT_REGEX.findall(sub_content)
             for result_group in results:
                 lines: List[str] = result_group[0].split('\n')
                 number: str = lines[0]
@@ -135,17 +136,22 @@ class CleanSubSRT(CleanSub):
 
 class CleanSubASS(CleanSub):
     def __init__(self, sub_file_path: str):
-        super(CleanSubASS, self).__init__(sub_file_path, 'ass')
+        ASS_CONTENT_PTN = r'(D.+: \d,)(\d:\d\d:\d\d\.\d{2,3},\d:\d\d:\d\d\.\d{2,3})(,\w+,.*,\d,\d,\d,.*?,)(.+)'
+        super(CleanSubASS, self).__init__(sub_file_path, 'ass', ASS_CONTENT_PTN)
         self._info_content: List[str] = []
+        self.__EMPTY_PTN = r'(D.+: \d,)(\d:\d\d:\d\d\.\d{2,3},\d:\d\d:\d\d\.\d{2,3})(,\w+,.*,\d,\d,\d,.*,)$'
+        self.__GRAPHICS_PTN = r'\[Graphics\]\n(.+\n)*'
+        self.__FONTS_PTN = r'\[Fonts\]\n(.+\n)*'
+        self.__EMPTY_REGEX: Pattern[str] = re.compile(self.__EMPTY_PTN)
+        self.__GRAPHICS_REGEX: Pattern[str] = re.compile(self.__GRAPHICS_PTN)
+        self.__FONTS_REGEX: Pattern[str] = re.compile(self.__FONTS_PTN)
 
     def extract_subtitles(self, remove_empty: bool = REMOVE_EMPTY):
         with open(self._sub_file_path, 'r', encoding='utf8') as sub_file:
             sub_lines = sub_file.readlines()
-            SUB_PATTERN = r'(D.+: \d,)(\d:\d\d:\d\d\.\d{2,3},\d:\d\d:\d\d\.\d{2,3})(,\w+,.*,\d,\d,\d,.*?,)(.+)'
-            REGEX: Pattern[str] = re.compile(SUB_PATTERN)
             for line in sub_lines:
-                if REGEX.match(line):
-                    content: ASSRegexResults = REGEX.findall(line)[0]
+                if self.__CONTENT_REGEX.match(line):
+                    content: ASSRegexResults = self.__CONTENT_REGEX.findall(line)[0]
                     sub_part: ASSSubPart = {
                         "part_1": content[0],
                         "timestamp": content[1],
@@ -154,11 +160,9 @@ class CleanSubASS(CleanSub):
                     }
                     self._extracted_sub_content.append(sub_part)
                 else:
-                    EMPTY_PATTERN = r'(D.+: \d,)(\d:\d\d:\d\d\.\d{2,3},\d:\d\d:\d\d\.\d{2,3})(,\w+,.*,\d,\d,\d,.*,)$'
-                    REGEX_2: Pattern[str] = re.compile(EMPTY_PATTERN)
-                    if REGEX_2.match(line):
+                    if self.__EMPTY_REGEX.match(line):
                         if not remove_empty:
-                            content: ASSRegexResults = REGEX_2.findall(line)[0]
+                            content: ASSRegexResults = self.__EMPTY_REGEX.findall(line)[0]
                             sub_part: ASSSubPart = {
                                 "part_1": content[0],
                                 "timestamp": content[1],
@@ -186,16 +190,12 @@ class CleanSubASS(CleanSub):
         return filename
 
     def remove_graphics_and_fonts(self):
-        GRAPHICS_PTN = r'\[Graphics\]\n(.+\n)*'
-        FONTS_PTN = r'\[Fonts\]\n(.+\n)*'
-        GRAPHICS_REGEX: Pattern[str] = re.compile(GRAPHICS_PTN)
-        FONTS_REGEX: Pattern[str] = re.compile(FONTS_PTN)
         info_str: str = ''.join(self._info_content)
 
-        if GRAPHICS_REGEX.search(info_str):
-            info_str = GRAPHICS_REGEX.sub("", info_str)
-        if FONTS_REGEX.search(info_str):
-            info_str = FONTS_REGEX.sub("", info_str)
+        if self.__GRAPHICS_REGEX.search(info_str):
+            info_str = self.__GRAPHICS_REGEX.sub("", info_str)
+        if self.__FONTS_REGEX.search(info_str):
+            info_str = self.__FONTS_REGEX.sub("", info_str)
 
         info: List[str] = info_str.split('\n')
         for line in info[::-1]:
