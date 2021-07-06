@@ -41,3 +41,6 @@ CREATE_NEW_FILE = False
 
 # Remove Empty Subtitle Lines. Only For .ass Files
 REMOVE_EMPTY = True
+
+# Supported File Types
+FILE_TYPES = ('ass', 'smi', 'srt')

@@ -3,7 +3,8 @@ from typing import Union
 from colorama import init, Fore
 from PyInquirer import prompt, Validator, ValidationError
 from core.dtypes import ContentList
-from core.clean import CleanSubSRT, CleanSubASS
+from core.clean import CleanSubSRT, CleanSubASS, CleanSubSmi
+from core.config import FILE_TYPES
 
 if os.name == "posix":
     init()
@@ -14,7 +15,7 @@ elif os.name == 'nt':
 class PathValidator(Validator):
     def validate(self, document):
         valid_path = os.path.isfile(document.text)
-        valid_type = document.text[-3:] in ('srt', 'ass')
+        valid_type = document.text[-3:] in FILE_TYPES
         if not valid_path and valid_type:
             raise ValidationError(
                 message="Invalid file. Please enter valid file path",
@@ -34,9 +35,11 @@ sub_file_path: str = answer['sub_file_path'].strip('"')
 sub_file_path = sub_file_path.strip("' ")
 filetype = sub_file_path[-3:]
 
-cleaner: Union[CleanSubASS, CleanSubSRT]
+cleaner: Union[CleanSubASS, CleanSubSRT, CleanSubSmi]
 if filetype == "srt":
     cleaner = CleanSubSRT(sub_file_path)
+elif filetype == 'smi':
+    cleaner = CleanSubSmi(sub_file_path)
 else:
     cleaner = CleanSubASS(sub_file_path)
 
