@@ -243,7 +243,7 @@ class CleanSubSmi(CleanSub):
             self._extracted_full_content = self._extracted_sub_content
 
             info_results: str = self.__INFO_HEAD_REGEX.findall(sub_content)[0]
-            self._info_content = info_results
+            self._info_content['head'] = info_results
 
     def create_new_sub_file(self) -> str:
         filename = self._get_file_name()
