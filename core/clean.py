@@ -47,9 +47,9 @@ class CleanSub(ABC):
             start, end = timestamp.split('-')
             sms, ems = int(start[-3:]), int(end[-3:])
             start, end = int(start[:-3]), int(end[:-3])
-            sh, eh = start / 3600, end / 3600
+            sh, eh = start // 3600, end // 3600
             start, end = start % 3600, end % 3600
-            sm, em = start / 60, end / 60
+            sm, em = start // 60, end // 60
             ss, es = start % 60, end % 60
             s_sec = float(f"{ss}.{sms}")
             e_sec = float(f"{es}.{ems}")
@@ -101,6 +101,12 @@ class CleanSub(ABC):
                 continue
             self._content_to_write.append(content)
 
+    def _get_file_name(self) -> str:
+        if CREATE_NEW_FILE:
+            return f'{self._sub_file_path[:-4]}-NEW.{self.filetype}'
+        else:
+            return self._sub_file_path
+
     @abstractmethod
     def extract_subtitles(self):
         pass
@@ -133,11 +139,7 @@ class CleanSubSRT(CleanSub):
             self._extracted_full_content = self._extracted_sub_content
 
     def create_new_sub_file(self) -> str:
-        if CREATE_NEW_FILE:
-            filename = f'{self._sub_file_path[:-4]}-NEW.{self._sub_file_path[-3:]}'
-        else:
-            filename = self._sub_file_path
-
+        filename = self._get_file_name()
         with open(filename, 'w', encoding='utf8') as sub_file:
             for i, content in enumerate(self._content_to_write, 1):
                 sub_content = '\n'.join(content['content'])
@@ -187,11 +189,7 @@ class CleanSubASS(CleanSub):
             self._extracted_full_content = self._extracted_sub_content
 
     def create_new_sub_file(self) -> str:
-        if CREATE_NEW_FILE:
-            filename = f'{self._sub_file_path[:-4]}-NEW.{self._sub_file_path[-3:]}'
-        else:
-            filename = self._sub_file_path
-
+        filename = self._get_file_name()
         with open(filename, 'w', encoding='utf8') as sub_file:
             for info in self._info_content:
                 sub_file.write(info + '\n')
@@ -248,4 +246,11 @@ class CleanSubSmi(CleanSub):
             self._info_content = info_results
 
     def create_new_sub_file(self) -> str:
-        pass
+        filename = self._get_file_name()
+        with open(filename, 'w', encoding='utf16') as sub_file:
+            sub_file.write(self._info_content['head'])
+            for content in self._content_to_write:
+                sub = f"{content['start']}\n{content['content']}\n{content['end']}\n"
+                sub_file.write(sub)
+            sub_file.write(self._info_content['tale'])
+        return filename
