@@ -6,9 +6,11 @@
 # Node artifact files
 node_modules/
 dist/
+build/
 __pycache__/
 SUB/
 .mypy_cache/
+/.vscode/
 
 # Compiled Java class files
 *.class
@@ -55,5 +57,7 @@ Thumbs.db
 *.idx
 *.sub
 *.ass
+*.smi
 
 scratch.py
+*.spec

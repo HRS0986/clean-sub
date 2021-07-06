@@ -18,20 +18,29 @@ KEYWORDS = (
     'SUBZ.LK',
     'Subs.lk',
     'subz.lk',
-    'www.cineru.lk',
-    'www.Cineru.lk',
-    'www.Upasirasi.com',
-    'www.Upasirasi.Com',
-    'www.upasirasi.com',
-    'www.PirateLk.Com',
-    'www.Piratelk.Com',
-    'www.Piratelk.com',
-    'www.piratelk.com',
-    'www.baiscopelk.com',
-    'www.Baiscopelk.com',
-    'www.BaiscopeLK.com',
-    'www.BaiscopeLK.Com',
+    "cineru.lk",
+    "Cineru.lk",
+    'Upasirasi.com',
+    'upasirasi.com',
+    'PirateLk.Com',
+    'pirateLk.Com',
+    'piratelk.Com',
+    'baiscopelk.com',
+    'Baiscopelk.com',
+    'BaiscopeLK.com',
+    'BaiscopeLk.com',
+    'www.',
+    'WWW.',
+    '\pos',
+    'c&H',
+    '<font color=',
 )
 
 # Create new subtitle file or modify the current subtitle file
 CREATE_NEW_FILE = False
+
+# Remove Empty Subtitle Lines. Only For .ass Files
+REMOVE_EMPTY = True
+
+# Supported File Types
+FILE_TYPES = ('ass', 'smi', 'srt')
