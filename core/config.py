@@ -1,11 +1,13 @@
+from typing import Final, Tuple
+
 # Minimum display duration of a subtitle to check
-MIN_DURATION = 0.5
+MIN_DURATION: Final[float] = 0.5
 
 # Maximum display duration of a subtitle to check
-MAX_DURATION = 7
+MAX_DURATION: Final[int] = 7
 
 # Words to check in a subtitle
-KEYWORDS = (
+KEYWORDS: Final[Tuple[str, ...]] = (
     'උපසිරැසි',
     'උපසිරසි',
     'උපසිරස',
@@ -37,10 +39,10 @@ KEYWORDS = (
 )
 
 # Create new subtitle file or modify the current subtitle file
-CREATE_NEW_FILE = False
+CREATE_NEW_FILE: Final[bool] = False
 
 # Remove Empty Subtitle Lines. Only For .ass Files
-REMOVE_EMPTY = True
+REMOVE_EMPTY: Final[bool] = True
 
 # Supported File Types
-FILE_TYPES = ('ass', 'smi', 'srt')
+FILE_TYPES: Final[Tuple[str, ...]] = ('ass', 'smi', 'srt')
