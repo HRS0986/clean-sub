@@ -96,7 +96,9 @@ if __name__ == '__main__':
     sub_cleaner: Cleaner = create_cleaner(subtitle_path, sub_type)
     detected_content, sub_cleaner = detect_unwanted(sub_cleaner)
 
-    if (len(detected_content)) != 0:
+    is_cleaned: bool = len(detected_content) == 0
+
+    if not is_cleaned:
         selected_content: list = select_to_remove(detected_content, sub_type)
         clean_sub_file(detected_content, sub_cleaner, selected_content)
     else:
