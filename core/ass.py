@@ -35,14 +35,14 @@ class CleanSubASS(CleanSub):
                     # Split script information of the ass file
                     if self.__EMPTY_REGEX.match(line):
                         if not remove_empty:
-                            content: ASSRegexResults = self.__EMPTY_REGEX.findall(line)[0]
-                            sub_part: ASSSubPart = {
-                                "part_1": content[0],
-                                "timestamp": content[1],
-                                "part_2": content[2],
+                            info_content: ASSRegexResults = self.__EMPTY_REGEX.findall(line)[0]
+                            info_part: ASSSubPart = {
+                                "part_1": info_content[0],
+                                "timestamp": info_content[1],
+                                "part_2": info_content[2],
                                 "content": ''
                             }
-                            self._extracted_sub_content.append(sub_part)
+                            self._extracted_sub_content.append(info_part)
                     else:
                         self._info_content.append(line)
             self._extracted_full_content = self._extracted_sub_content

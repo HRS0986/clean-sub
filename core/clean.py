@@ -39,20 +39,22 @@ class CleanSub(ABC):
         start, end, sec_separator = '', '', ','
         if self.filetype == 'srt':
             start, end = timestamp.split(' --> ')
+
         elif self.filetype == 'ass':
             start, end = timestamp.split(',')
             sec_separator = '.'
+
         elif self.filetype == 'smi':
             start, end = timestamp.split('-')
-            sms, ems = int(start[-3:]), int(end[-3:])
-            start, end = int(start[:-3]), int(end[:-3])
-            sh, eh = start // 3600, end // 3600
-            start, end = start % 3600, end % 3600
-            sm, em = start // 60, end // 60
-            ss, es = start % 60, end % 60
-            s_sec = float(f"{ss}.{sms}")
-            e_sec = float(f"{es}.{ems}")
-            return {'start': [sh, sm, s_sec], 'end': [eh, em, e_sec]}
+            smi_sms, smi_ems = int(start[-3:]), int(end[-3:])
+            smi_start, smi_end = int(start[:-3]), int(end[:-3])
+            smi_sh, smi_eh = smi_start // 3600, smi_end // 3600
+            smi_start, smi_end = smi_start % 3600, smi_end % 3600
+            smi_sm, smi_em = smi_start // 60, smi_end // 60
+            smi_ss, smi_es = smi_start % 60, smi_end % 60
+            s_sec = float(f"{smi_ss}.{smi_sms}")
+            e_sec = float(f"{smi_es}.{smi_ems}")
+            return {'start': [smi_sh, smi_sm, s_sec], 'end': [smi_eh, smi_em, e_sec]}
 
         sh, sm, ss = start.split(':')
         ss, sms = ss.split(sec_separator)
