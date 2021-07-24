@@ -4,11 +4,15 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-pyinquirer = "*"
-colorama = "*"
+pyinquirer = "==1.0.3"
+colorama = "==0.4.4"
 
 [dev-packages]
-mypy = "*"
+mypy = "==0.902"
 
 [requires]
 python_version = "3.9"
+
+[scripts]
+check = "mypy main.py core"
+start = "python main.py"
