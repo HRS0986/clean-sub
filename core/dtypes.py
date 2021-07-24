@@ -1,5 +1,6 @@
 from typing import List, Dict, Tuple, Union
 
+
 ContentList = List[Dict[str, Union[str, List[str]]]]
 SplitTimestamp = Dict[str, List[Union[int, float]]]
 SRTSubPart = Dict[str, Union[str, List[str]]]
