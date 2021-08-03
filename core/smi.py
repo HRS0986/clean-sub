@@ -7,13 +7,13 @@ from .clean import CleanSub
 
 class CleanSubSmi(CleanSub):
     def __init__(self, sub_file_path: str):
-        SMI_CONTENT_PTN = r"(<SYNC.+)\n(.+)\n(<SYNC .+?nbsp)"
-        super(CleanSubSmi, self).__init__(sub_file_path, 'smi', SMI_CONTENT_PTN)
+        SMI_CONTENT_PATTERN = r"(<SYNC.+)\n(.+)\n(<SYNC .+?nbsp)"
+        super(CleanSubSmi, self).__init__(sub_file_path, 'smi', SMI_CONTENT_PATTERN)
         self._info_content: Dict[str, str] = {"head": "", "tale": "\n</BODY>\n</SAMI>"}
-        self.__INFO_HEAD_PTN = r"<SAMI>.+<BODY>\n"
-        self.__TIMESTAMP_PTN = r"Start=(\d+?)>"
-        self.__INFO_HEAD_REGEX = re.compile(self.__INFO_HEAD_PTN, flags=re.DOTALL)
-        self.__TIMESTAMP_REGEX = re.compile(self.__TIMESTAMP_PTN)
+        self.__INFO_HEAD_PATTERN = r"<SAMI>.+<BODY>\n"
+        self.__TIMESTAMP_PATTERN = r"Start=(\d+?)>"
+        self.__INFO_HEAD_REGEX = re.compile(self.__INFO_HEAD_PATTERN, flags=re.DOTALL)
+        self.__TIMESTAMP_REGEX = re.compile(self.__TIMESTAMP_PATTERN)
 
     def extract_subtitles(self):
         with open(self._sub_file_path, 'r', encoding='utf16', errors='ignore') as sub_file:

@@ -6,17 +6,20 @@ from .dtypes import ContentList, SplitTimestamp
 
 
 class CleanSub(ABC):
-    def __init__(self, sub_file_path: str, filetype: str, content_ptn: str):
+    def __init__(self, sub_file_path: str, filetype: str, content_pattern: str):
         self._sub_file_path = sub_file_path
         self._extracted_sub_content: ContentList = []
         self._extracted_full_content: ContentList = []
         self._unwanted_content: ContentList = []
         self._content_to_write: ContentList = []
         self.filetype = filetype
-        self.__CONTENT_PTN = content_ptn
-        self._CONTENT_REGEX: Pattern[str] = re.compile(self.__CONTENT_PTN)
+        self.__CONTENT_PATTERN = content_pattern
+        self._CONTENT_REGEX: Pattern[str] = re.compile(self.__CONTENT_PATTERN)
 
     def _calculate_duration(self, start: List[int], end: List[int]) -> float:
+        '''
+        Calculate subtitle's display duration
+        '''
         duration = 0.000
         s_seconds, s_minutes, s_hours = start[-1], start[1], start[0]
         e_seconds, e_minutes, e_hours = end[-1], end[1], end[0]
@@ -103,6 +106,9 @@ class CleanSub(ABC):
             self._content_to_write.append(content)
 
     def _get_file_name(self) -> str:
+        '''
+        Return new subtitle file's name
+        '''
         if CREATE_NEW_FILE:
             return f'{self._sub_file_path[:-4]}-NEW.{self.filetype}'
         else:

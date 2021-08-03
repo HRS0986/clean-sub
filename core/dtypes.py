@@ -1,7 +1,7 @@
-from typing import List, Dict, Tuple, Union
+from typing import List, Dict, Mapping, Tuple, Union
 
 
-ContentList = List[Dict[str, Union[str, List[str]]]]
+ContentList = List[Mapping[str, Union[str, List[str]]]]
 SplitTimestamp = Dict[str, List[Union[int, float]]]
 SRTSubPart = Dict[str, Union[str, List[str]]]
 ASSSubPart = Dict[str, str]

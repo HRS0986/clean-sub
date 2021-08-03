@@ -5,8 +5,8 @@ from .clean import CleanSub
 
 class CleanSubSRT(CleanSub):
     def __init__(self, sub_file_path: str):
-        SRT_CONTENT_PTN = r'([0-9]+\n.+(\n.+){1,})'
-        super(CleanSubSRT, self).__init__(sub_file_path, 'srt', SRT_CONTENT_PTN)
+        SRT_CONTENT_PATTERN = r'([0-9]+\n.+(\n.+){1,})'
+        super(CleanSubSRT, self).__init__(sub_file_path, 'srt', SRT_CONTENT_PATTERN)
 
     def extract_subtitles(self) -> None:
         with open(self._sub_file_path, 'r', encoding='utf8') as sub_file:

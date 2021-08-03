@@ -8,20 +8,21 @@ from .clean import CleanSub
 
 class CleanSubASS(CleanSub):
     def __init__(self, sub_file_path: str):
-        ASS_CONTENT_PTN = r'(D.+: \d,)(\d:\d\d:\d\d\.\d{2,3},\d:\d\d:\d\d\.\d{2,3})(,\w+,.*,\d,\d,\d,.*?,)(.+)'
-        super(CleanSubASS, self).__init__(sub_file_path, 'ass', ASS_CONTENT_PTN)
+        ASS_CONTENT_PATTERN = r'(D.+: \d,)(\d:\d\d:\d\d\.\d{2,3},\d:\d\d:\d\d\.\d{2,3})(,\w+,.*,\d,\d,\d,.*?,)(.+)'
+        super(CleanSubASS, self).__init__(sub_file_path, 'ass', ASS_CONTENT_PATTERN)
         self._info_content: List[str] = []
-        self.__EMPTY_PTN = r'(D.+: \d,)(\d:\d\d:\d\d\.\d{2,3},\d:\d\d:\d\d\.\d{2,3})(,\w+,.*,\d,\d,\d,.*,)$'
-        self.__GRAPHICS_PTN = r'\[Graphics\]\n(.+\n)*'
-        self.__FONTS_PTN = r'\[Fonts\]\n(.+\n)*'
-        self.__EMPTY_REGEX: Pattern[str] = re.compile(self.__EMPTY_PTN)
-        self.__GRAPHICS_REGEX: Pattern[str] = re.compile(self.__GRAPHICS_PTN)
-        self.__FONTS_REGEX: Pattern[str] = re.compile(self.__FONTS_PTN)
+        self.__EMPTY_PATTERN = r'(D.+: \d,)(\d:\d\d:\d\d\.\d{2,3},\d:\d\d:\d\d\.\d{2,3})(,\w+,.*,\d,\d,\d,.*,)$'
+        self.__GRAPHICS_PATTERN = r'\[Graphics\]\n(.+\n)*'
+        self.__FONTS_PATTERN = r'\[Fonts\]\n(.+\n)*'
+        self.__EMPTY_REGEX: Pattern[str] = re.compile(self.__EMPTY_PATTERN)
+        self.__GRAPHICS_REGEX: Pattern[str] = re.compile(self.__GRAPHICS_PATTERN)
+        self.__FONTS_REGEX: Pattern[str] = re.compile(self.__FONTS_PATTERN)
 
     def extract_subtitles(self, remove_empty: bool = REMOVE_EMPTY):
         with open(self._sub_file_path, 'r', encoding='utf8') as sub_file:
             sub_lines = sub_file.readlines()
             for line in sub_lines:
+                # Extract subtitle content line
                 if self._CONTENT_REGEX.match(line):
                     content: ASSRegexResults = self._CONTENT_REGEX.findall(line)[0]
                     sub_part: ASSSubPart = {
@@ -32,7 +33,7 @@ class CleanSubASS(CleanSub):
                     }
                     self._extracted_sub_content.append(sub_part)
                 else:
-                    # Split script information of the ass file
+                    # Extract empty content Lines
                     if self.__EMPTY_REGEX.match(line):
                         if not remove_empty:
                             info_content: ASSRegexResults = self.__EMPTY_REGEX.findall(line)[0]
@@ -44,6 +45,7 @@ class CleanSubASS(CleanSub):
                             }
                             self._extracted_sub_content.append(info_part)
                     else:
+                        # Collect script information of the ass file
                         self._info_content.append(line)
             self._extracted_full_content = self._extracted_sub_content
 
@@ -61,11 +63,13 @@ class CleanSubASS(CleanSub):
     def remove_graphics_and_fonts(self):
         info_str: str = ''.join(self._info_content)
 
+        # Replace graphics content and font content with "" 
         if self.__GRAPHICS_REGEX.search(info_str):
             info_str = self.__GRAPHICS_REGEX.sub("", info_str)
         if self.__FONTS_REGEX.search(info_str):
             info_str = self.__FONTS_REGEX.sub("", info_str)
 
+        # Remove graphics content and font content in ASS file's infomation content part
         info: List[str] = info_str.split('\n')
         for line in info[::-1]:
             if len(line) == 0:
