@@ -8,9 +8,9 @@ from .clean import CleanSub
 
 
 class CleanSubSmi(CleanSub):
-    def __init__(self, sub_file_path: str, config_handler: ConfigHandler):
+    def __init__(self, config_handler: ConfigHandler):
         SMI_CONTENT_PATTERN = r"(<SYNC.+)\n(.+)\n(<SYNC .+?nbsp)"
-        super(CleanSubSmi, self).__init__(sub_file_path, 'smi', SMI_CONTENT_PATTERN, config_handler)
+        super(CleanSubSmi, self).__init__(SMI_CONTENT_PATTERN, config_handler)
         self._info_content: Dict[str, str] = {"head": "", "tale": "\n</BODY>\n</SAMI>"}
         self.__INFO_HEAD_PATTERN = r"<SAMI>.+<BODY>\n"
         self.__TIMESTAMP_PATTERN = r"Start=(\d+?)>"
