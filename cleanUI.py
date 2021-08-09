@@ -1,14 +1,13 @@
 import os
 from typing import Tuple, Union
 from colorama import init, Fore
-from PyInquirer import prompt, Validator, ValidationError
+from PyInquirer import prompt
 
 from config.config import ConfigHandler
 from dtypes import ContentList
 from core.ass import CleanSubASS
 from core.smi import CleanSubSmi
 from core.srt import CleanSubSRT
-from config.default_config import FILE_TYPES
 
 if os.name == "posix":
     init()
@@ -18,39 +17,13 @@ elif os.name == 'nt':
 Cleaner = Union[CleanSubASS, CleanSubSRT, CleanSubSmi]
 
 
-class PathValidator(Validator):
-    def validate(self, document):
-        valid_path: bool = os.path.isfile(document.text)
-        valid_type: bool = document.text[-3:] in FILE_TYPES
-        if not valid_path and valid_type:
-            raise ValidationError(
-                message="Invalid file. Please enter valid file path",
-                cursor_position=len(document.text)
-            )
-
-
-def take_sub_file_from_user() -> Tuple[str, str]:
-    question_1 = {
-        "type": "input",
-        "name": "sub_file_path",
-        "message": "Enter Subtitle File Path: ",
-        "validate": PathValidator
-    }
-
-    answer_1: dict = prompt(question_1)
-    sub_file_path: str = answer_1['sub_file_path'].strip('"')
-    sub_file_path = sub_file_path.strip("' ")
-    filetype: str = sub_file_path[-3:]
-    return sub_file_path, filetype
-
-
-def create_cleaner(sub_file_path: str, filetype: str, config_handler: ConfigHandler) -> Cleaner:
+def create_cleaner(filetype: str, config_handler: ConfigHandler) -> Cleaner:
     if filetype == "srt":
-        return CleanSubSRT(sub_file_path, config_handler)
+        return CleanSubSRT(config_handler)
     elif filetype == 'smi':
-        return CleanSubSmi(sub_file_path, config_handler)
+        return CleanSubSmi(config_handler)
     else:
-        return CleanSubASS(sub_file_path, config_handler)
+        return CleanSubASS(config_handler)
 
 
 def detect_unwanted(cleaner: Cleaner) -> Tuple[ContentList, Cleaner]:
@@ -93,9 +66,8 @@ def clean_sub_file(unwanted_content: ContentList, cleaner: Cleaner, selected: li
     print(Fore.BLUE + f"\n --> File Saved To {filename}\n" + Fore.RESET)
 
 
-def execute(config_handler: ConfigHandler):
-    subtitle_path, sub_type = take_sub_file_from_user()
-    sub_cleaner: Cleaner = create_cleaner(subtitle_path, sub_type, config_handler)
+def execute(config_handler: ConfigHandler, sub_type: str):
+    sub_cleaner: Cleaner = create_cleaner(sub_type, config_handler)
     detected_content, sub_cleaner = detect_unwanted(sub_cleaner)
 
     is_cleaned: bool = len(detected_content) == 0
