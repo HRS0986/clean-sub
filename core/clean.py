@@ -1,17 +1,19 @@
 import re
-from config.default_config import MIN_DURATION, MAX_DURATION, KEYWORDS, CREATE_NEW_FILE
+
+from config.config import ConfigHandler
 from abc import abstractmethod, ABC
 from typing import List, Union, Pattern
 from dtypes import ContentList, SplitTimestamp
 
 
 class CleanSub(ABC):
-    def __init__(self, sub_file_path: str, filetype: str, content_pattern: str):
+    def __init__(self, sub_file_path: str, filetype: str, content_pattern: str, config_handler: ConfigHandler):
         self._sub_file_path = sub_file_path
         self._extracted_sub_content: ContentList = []
         self._extracted_full_content: ContentList = []
         self._unwanted_content: ContentList = []
         self._content_to_write: ContentList = []
+        self._config_handler = config_handler
         self.filetype = filetype
         self.__CONTENT_PATTERN = content_pattern
         self._CONTENT_REGEX: Pattern[str] = re.compile(self.__CONTENT_PATTERN)
@@ -75,7 +77,7 @@ class CleanSub(ABC):
         after_content: ContentList = []
         for content in self._extracted_sub_content:
             sub_content = ' '.join(content['content']) if self.filetype == 'srt' else content['content']
-            for keyword in KEYWORDS:
+            for keyword in self._config_handler.keywords:
                 if keyword in sub_content:
                     self._unwanted_content.append(content)
                     break
@@ -90,9 +92,9 @@ class CleanSub(ABC):
             start: List[Union[int, float]] = split_timestamp['start']
             end: List[Union[int, float]] = split_timestamp['end']
             duration = self._calculate_duration(start, end)
-            if duration <= MIN_DURATION:
+            if duration <= self._config_handler.min:
                 self._unwanted_content.append(content)
-            elif duration >= MAX_DURATION:
+            elif duration >= self._config_handler.max:
                 self._unwanted_content.append(content)
             else:
                 after_duration.append(content)
@@ -106,10 +108,10 @@ class CleanSub(ABC):
             self._content_to_write.append(content)
 
     def _get_file_name(self) -> str:
-        '''
+        """
         Return new subtitle file's name
-        '''
-        if CREATE_NEW_FILE:
+        """
+        if self._config_handler.new_file:
             return f'{self._sub_file_path[:-4]}-NEW.{self.filetype}'
         else:
             return self._sub_file_path

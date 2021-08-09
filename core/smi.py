@@ -1,14 +1,16 @@
 import re
 from typing import Dict
+
+from config.config import ConfigHandler
 from dtypes import SMISubPart
 from dtypes import SMIRegexResults
 from .clean import CleanSub
 
 
 class CleanSubSmi(CleanSub):
-    def __init__(self, sub_file_path: str):
+    def __init__(self, sub_file_path: str, config_handler: ConfigHandler):
         SMI_CONTENT_PATTERN = r"(<SYNC.+)\n(.+)\n(<SYNC .+?nbsp)"
-        super(CleanSubSmi, self).__init__(sub_file_path, 'smi', SMI_CONTENT_PATTERN)
+        super(CleanSubSmi, self).__init__(sub_file_path, 'smi', SMI_CONTENT_PATTERN, config_handler)
         self._info_content: Dict[str, str] = {"head": "", "tale": "\n</BODY>\n</SAMI>"}
         self.__INFO_HEAD_PATTERN = r"<SAMI>.+<BODY>\n"
         self.__TIMESTAMP_PATTERN = r"Start=(\d+?)>"

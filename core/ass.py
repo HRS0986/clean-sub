@@ -1,4 +1,6 @@
 import re
+
+from config.config import ConfigHandler
 from config.default_config import REMOVE_EMPTY
 from typing import List, Pattern
 from dtypes import ASSSubPart
@@ -7,9 +9,9 @@ from .clean import CleanSub
 
 
 class CleanSubASS(CleanSub):
-    def __init__(self, sub_file_path: str):
+    def __init__(self, sub_file_path: str, config_handler: ConfigHandler):
         ASS_CONTENT_PATTERN = r'(D.+: \d,)(\d:\d\d:\d\d\.\d{2,3},\d:\d\d:\d\d\.\d{2,3})(,\w+,.*,\d,\d,\d,.*?,)(.+)'
-        super(CleanSubASS, self).__init__(sub_file_path, 'ass', ASS_CONTENT_PATTERN)
+        super(CleanSubASS, self).__init__(sub_file_path, 'ass', ASS_CONTENT_PATTERN, config_handler)
         self._info_content: List[str] = []
         self.__EMPTY_PATTERN = r'(D.+: \d,)(\d:\d\d:\d\d\.\d{2,3},\d:\d\d:\d\d\.\d{2,3})(,\w+,.*,\d,\d,\d,.*,)$'
         self.__GRAPHICS_PATTERN = r'\[Graphics\]\n(.+\n)*'

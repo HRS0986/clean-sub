@@ -1,14 +1,14 @@
 from argparse import ArgumentParser
 from cleanUI import execute
 from pathlib import Path
+from config.config import ConfigHandler
 
 
 parser = ArgumentParser(
     description="Remove Annoying Stuff From Subtitle Files",
     prog="cleansub",
     epilog="By Hirusha Fernando",
-    usage="%(prog)s [--file FILE] [--max MAX] [--min MIN] [--no-empty] [--new | --ext] [--add KEYWORDS | --keywords "
-          "KEYWORDS ] [--exclude KEYWORDS | --keywords KEYWORDS] "
+    usage="%(prog)s [--file FILE] [--max MAX] [--min MIN] [--no-empty] [--new | --ext] [--keywords KEYWORDS | --additional KEYWORDS --exclude KEYWORDS]"
 )
 parser.add_argument(
     '-s',
@@ -45,9 +45,7 @@ parser.add_argument(
     help="Remove empty content lines",
     action="store_true"
 )
-
-group_keywords_exclude = parser.add_mutually_exclusive_group()
-group_keywords_exclude.add_argument(
+parser.add_argument(
     '-k',
     '--keywords',
     help="Keywords checklist",
@@ -55,7 +53,7 @@ group_keywords_exclude.add_argument(
     dest="KEYWORDS",
     nargs="+"
 )
-group_keywords_exclude.add_argument(
+parser.add_argument(
     '-r',
     '--exclude',
     help="Keywords to exclude from default checklist",
@@ -63,17 +61,7 @@ group_keywords_exclude.add_argument(
     dest="EX_KEYWORDS",
     nargs="+"
 )
-
-group_keywords_add = parser.add_mutually_exclusive_group()
-group_keywords_add.add_argument(
-    '-k',
-    '--keywords',
-    help="Keywords checklist",
-    type=str,
-    dest="KEYWORDS",
-    nargs="+"
-)
-group_keywords_add.add_argument(
+parser.add_argument(
     '-a',
     '--add',
     help="Keywords to add default checklist",
@@ -99,3 +87,5 @@ group_file.add_argument(
 args = parser.parse_args()
 
 print(args)
+
+config_handler = ConfigHandler()

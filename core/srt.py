@@ -1,12 +1,14 @@
 from typing import List
+
+from config.config import ConfigHandler
 from dtypes import SRTRegexResults, SRTSubPart
 from .clean import CleanSub
 
 
 class CleanSubSRT(CleanSub):
-    def __init__(self, sub_file_path: str):
+    def __init__(self, sub_file_path: str, config_handler: ConfigHandler):
         SRT_CONTENT_PATTERN = r'([0-9]+\n.+(\n.+){1,})'
-        super(CleanSubSRT, self).__init__(sub_file_path, 'srt', SRT_CONTENT_PATTERN)
+        super(CleanSubSRT, self).__init__(sub_file_path, 'srt', SRT_CONTENT_PATTERN, config_handler)
 
     def extract_subtitles(self) -> None:
         with open(self._sub_file_path, 'r', encoding='utf8') as sub_file:
