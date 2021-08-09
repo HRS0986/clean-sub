@@ -1,5 +1,4 @@
-from typing import List, Dict, Mapping, Tuple, Union
-
+from typing import List, Dict, Mapping, Tuple, Union, Literal
 
 ContentList = List[Mapping[str, Union[str, List[str]]]]
 SplitTimestamp = Dict[str, List[Union[int, float]]]
@@ -9,3 +8,5 @@ SMISubPart = Dict[str, str]
 SRTRegexResults = List[Tuple[str, str]]
 ASSRegexResults = Tuple[str, str, str, str]
 SMIRegexResults = List[Tuple[str, str, str]]
+KeywordSet = Union[Tuple[str], List[Dict[str, Tuple[str]]]]
+KeywordStatus = Literal['additional', 'exclude', 'only']

@@ -1,5 +1,5 @@
 from typing import List
-from .dtypes import SRTRegexResults, SRTSubPart
+from dtypes import SRTRegexResults, SRTSubPart
 from .clean import CleanSub
 
 

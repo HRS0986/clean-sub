@@ -2,11 +2,11 @@ import os
 from typing import Tuple, Union
 from colorama import init, Fore
 from PyInquirer import prompt, Validator, ValidationError
-from core.dtypes import ContentList
+from dtypes import ContentList
 from core.ass import CleanSubASS
 from core.smi import CleanSubSmi
 from core.srt import CleanSubSRT
-from core.config import FILE_TYPES
+from config.default_config import FILE_TYPES
 
 if os.name == "posix":
     init()

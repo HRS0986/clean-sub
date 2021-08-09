@@ -4,7 +4,7 @@ from typing import Final, Tuple
 MIN_DURATION: Final[float] = 0.5
 
 # Maximum display duration of a subtitle to check
-MAX_DURATION: Final[int] = 7
+MAX_DURATION: Final[float] = 7.0
 
 # Words to check in a subtitle
 KEYWORDS: Final[Tuple[str, ...]] = (

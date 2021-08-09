@@ -1,7 +1,7 @@
 import re
 from typing import Dict
-from .dtypes import SMISubPart
-from .dtypes import SMIRegexResults
+from dtypes import SMISubPart
+from dtypes import SMIRegexResults
 from .clean import CleanSub
 
 

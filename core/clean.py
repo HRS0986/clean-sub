@@ -1,8 +1,8 @@
 import re
-from .config import MIN_DURATION, MAX_DURATION, KEYWORDS, CREATE_NEW_FILE
+from config.default_config import MIN_DURATION, MAX_DURATION, KEYWORDS, CREATE_NEW_FILE
 from abc import abstractmethod, ABC
 from typing import List, Union, Pattern
-from .dtypes import ContentList, SplitTimestamp
+from dtypes import ContentList, SplitTimestamp
 
 
 class CleanSub(ABC):
@@ -17,9 +17,9 @@ class CleanSub(ABC):
         self._CONTENT_REGEX: Pattern[str] = re.compile(self.__CONTENT_PATTERN)
 
     def _calculate_duration(self, start: List[int], end: List[int]) -> float:
-        '''
+        """
         Calculate subtitle's display duration
-        '''
+        """
         duration = 0.000
         s_seconds, s_minutes, s_hours = start[-1], start[1], start[0]
         e_seconds, e_minutes, e_hours = end[-1], end[1], end[0]

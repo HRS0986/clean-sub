@@ -1,8 +1,8 @@
 import re
-from .config import REMOVE_EMPTY
+from config.default_config import REMOVE_EMPTY
 from typing import List, Pattern
-from .dtypes import ASSSubPart
-from .dtypes import ASSRegexResults
+from dtypes import ASSSubPart
+from dtypes import ASSRegexResults
 from .clean import CleanSub
 
 
