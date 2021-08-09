@@ -7,14 +7,14 @@ from dtypes import ContentList, SplitTimestamp
 
 
 class CleanSub(ABC):
-    def __init__(self, sub_file_path: str, filetype: str, content_pattern: str, config_handler: ConfigHandler):
-        self._sub_file_path = sub_file_path
+    def __init__(self, content_pattern: str, config_handler: ConfigHandler):
+        self._sub_file_path = self._config_handler.sub_path
         self._extracted_sub_content: ContentList = []
         self._extracted_full_content: ContentList = []
         self._unwanted_content: ContentList = []
         self._content_to_write: ContentList = []
         self._config_handler = config_handler
-        self.filetype = filetype
+        self.filetype = self._config_handler.filtype
         self.__CONTENT_PATTERN = content_pattern
         self._CONTENT_REGEX: Pattern[str] = re.compile(self.__CONTENT_PATTERN)
 
@@ -111,7 +111,7 @@ class CleanSub(ABC):
         """
         Return new subtitle file's name
         """
-        if self._config_handler.new_file:
+        if self._config_handler.new_sub_file:
             return f'{self._sub_file_path[:-4]}-NEW.{self.filetype}'
         else:
             return self._sub_file_path
