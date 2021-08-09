@@ -1,53 +1,57 @@
-from typing import List
+from typing import List, Optional
 from config.default_config import MAX_DURATION, MIN_DURATION, REMOVE_EMPTY, CREATE_NEW_FILE, KEYWORDS
-from dtypes import KeywordSet, KeywordStatus
 
 
 class ConfigHandler:
-    def __init__(self, min_d: float = MIN_DURATION, max_d: float = MAX_DURATION, empty: bool = REMOVE_EMPTY,
-                 new_file: bool = CREATE_NEW_FILE,
-                 keywords: KeywordSet = KEYWORDS):
-        self.new_file = new_file
+    def __init__(
+            self,
+            sub_path: str,
+            filtype: str,
+            min_d: float = MIN_DURATION,
+            max_d: float = MAX_DURATION,
+            empty: bool = REMOVE_EMPTY,
+            script_path: Optional[str] = None,
+            new_file: Optional[bool] = None,
+            ext_file: Optional[bool] = None,
+            keywords_o: Optional[List[str]] = None,
+            keywords_a: Optional[List[str]] = None,
+            keywords_e: Optional[List[str]] = None
+    ):
+        self.__script_path = script_path
+        self.filtype = filtype
+        self.__new_file = new_file
+        self.__ext_file = ext_file
+        self.sub_path = sub_path
         self.empty = empty
         self.max = max_d
         self.min = min_d
-        self.keywords_temp = keywords
+        self.__keywords_o = keywords_o
+        self.__keywords_a = keywords_a
+        self.__keywords_e = keywords_e
+
+    @property
+    def new_sub_file(self):
+        if self.__new_file:
+            return True
+        elif self.__ext_file:
+            return False
+        return CREATE_NEW_FILE
 
     @property
     def keywords(self):
-        """
-        Allowed statuses:
-            additional - add these keywords to default keyword list
-            exclude - exclude these keywords to default keyword list
-            only - check these keywords only
-        """
-        if isinstance(self.keywords_temp, dict):
-            """
-            self.keywords_temp - structure 1
-             [
-                  {"status": "additional", "keywords": ["test", "r"]}
-                  {"status": "exclude", "keywords": ["t", "a"]}
-             ]    
+        keywords = [*KEYWORDS]
+        if self.__keywords_o:
+            return self.__keywords_o
 
-             self.keywords_temp - structure 2
-             [{"status": "only", "keywords": ["test", "r"]}]
-            """
+        if self.__keywords_a:
+            additional_keywords = ' '.join(self.__keywords_a).split(',')
+            keywords.extend(additional_keywords)
 
-            keywords: List[str] = []
-            for key_dict in self.keywords_temp:
-                status: KeywordStatus = key_dict['status']
-                if status == 'only':
-                    return key_dict['keywords']
+        if self.__keywords_e:
+            exclude_keywords = ' '.join(self.__keywords_e).split(',')
+            for keyword in exclude_keywords:
+                keywords.remove(keyword)
+        return keywords
 
-                elif status == 'additional':
-                    keywords.extend(KEYWORDS)
-                    keywords.extend(key_dict["keywords"])
-
-                elif status == 'exclude':
-                    for keyword in key_dict["keywords"]:
-                        keywords.remove(keyword)
-            return keywords
-        return KEYWORDS
-
-    def write_configuration_script(self, name: str):
+    def write_configuration_script(self, script_path: str):
         pass
