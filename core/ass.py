@@ -36,7 +36,7 @@ class CleanSubASS(CleanSub):
                 else:
                     # Extract empty content Lines
                     if self.__EMPTY_REGEX.match(line):
-                        if not self._config_handler.empty:
+                        if not self._config_handler.remove_empty:
                             info_content: ASSRegexResults = self.__EMPTY_REGEX.findall(line)[0]
                             info_part: ASSSubPart = {
                                 "part_1": info_content[0],

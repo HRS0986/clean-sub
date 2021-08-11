@@ -1,0 +1,42 @@
+{
+    "MIN_DURATION": 0.5,
+    "MAX_DURATION": 7.0,
+    "CREATE_NEW_FILE": false,
+    "REMOVE_EMPTY": true,
+    "FILE_TYPES": [
+        "ass",
+        "smi",
+        "srt"
+    ],
+    "KEYWORDS": [
+        "උපසිරැසි",
+        "උපසිරසි",
+        "උපසිරස",
+        "උපසිරැස",
+        "පරිවර්තන අයිතිය සුරකින්න",
+        "ඉෂාන් කොම්",
+        "SUBZLK",
+        "subzlk",
+        "SubzLK",
+        "SUBZ.LK",
+        "Subs.lk",
+        "subz.lk",
+        "cineru.lk",
+        "Cineru.lk",
+        "Upasirasi.com",
+        "upasirasi.com",
+        "PirateLk.Com",
+        "pirateLk.Com",
+        "piratelk.Com",
+        "baiscopelk.com",
+        "Baiscopelk.com",
+        "BaiscopeLK.com",
+        "BaiscopeLk.com",
+        "www.",
+        "WWW.",
+        "\\pos",
+        "c&H",
+        "<font color="
+    ],
+    "FILETYPES": ["ass", "smi", "srt"]
+}
