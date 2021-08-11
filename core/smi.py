@@ -18,6 +18,9 @@ class CleanSubSmi(CleanSub):
         self.__TIMESTAMP_REGEX = re.compile(self.__TIMESTAMP_PATTERN)
 
     def extract_subtitles(self):
+        """
+        Read and split subtitle file's content
+        """
         with open(self._sub_file_path, 'r', encoding='utf16', errors='ignore') as sub_file:
             sub_content: str = sub_file.read()
             content_results: SMIRegexResults = self._CONTENT_REGEX.findall(sub_content)

@@ -18,6 +18,11 @@ Cleaner = Union[CleanSubASS, CleanSubSRT, CleanSubSmi]
 
 
 def create_cleaner(filetype: str, config_handler: ConfigHandler) -> Cleaner:
+    """
+    :param filetype: Subtitle file's type
+    :param config_handler: ConfigHandler object contains configuration settings
+    :return: Cleaner object
+    """
     if filetype == "srt":
         return CleanSubSRT(config_handler)
     elif filetype == 'smi':
@@ -27,6 +32,11 @@ def create_cleaner(filetype: str, config_handler: ConfigHandler) -> Cleaner:
 
 
 def detect_unwanted(cleaner: Cleaner) -> Tuple[ContentList, Cleaner]:
+    """
+    Detect unwanted content in the subtitle file's content
+    :param cleaner: Cleaner object
+    :return: Detected unwanted content and provided cleaner object
+    """
     cleaner.extract_subtitles()
     if cleaner.filetype == 'ass':
         cleaner.remove_graphics_and_fonts()
@@ -36,6 +46,12 @@ def detect_unwanted(cleaner: Cleaner) -> Tuple[ContentList, Cleaner]:
 
 
 def select_to_remove(unwanted_content: ContentList, filetype: str) -> list:
+    """
+    ASk user what to remove among detected unwanted content
+    :param unwanted_content: Detected unwanted content
+    :param filetype: Subtitle file's type
+    :return: List containing what to remove from subtitle file's content
+    """
     question_2 = {
         "type": "checkbox",
         "name": "unwanted",
@@ -51,7 +67,13 @@ def select_to_remove(unwanted_content: ContentList, filetype: str) -> list:
     return answers_2
 
 
-def clean_sub_file(unwanted_content: ContentList, cleaner: Cleaner, selected: list) -> None:
+def clean_sub_file(unwanted_content: ContentList, cleaner: Cleaner, selected: list):
+    """
+    Remove unwanted content from subtitle file's content
+    :param unwanted_content: Detected unwanted content fom subtitle file's content
+    :param cleaner: Cleaner object
+    :param selected: Content to remove among unwanted_content from subtitle file's content
+    """
     to_remove: ContentList = []
     for sub in selected:
         timestamp = sub.split(' :- ')[0]
@@ -67,6 +89,11 @@ def clean_sub_file(unwanted_content: ContentList, cleaner: Cleaner, selected: li
 
 
 def execute(config_handler: ConfigHandler, sub_type: str):
+    """
+    Starting function
+    :param config_handler: ConfigHandler object containing configuration settings
+    :param sub_type: Subtitle file's type
+    """
     sub_cleaner: Cleaner = create_cleaner(sub_type, config_handler)
     detected_content, sub_cleaner = detect_unwanted(sub_cleaner)
 

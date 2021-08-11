@@ -13,6 +13,9 @@ SETTINGS = (
 
 
 class ConfigHandler:
+    """
+    This class handle all configuration operations
+    """
     def __init__(
             self,
             sub_path: str,
@@ -43,6 +46,11 @@ class ConfigHandler:
         self.__default_config_path = r'config/default_config.json'
 
     def __get_setting(self, name: str) -> Configuration:
+        """
+        Return a default setting value the from default configuration file
+        :param name: Setting name to get the from default configuration file
+        :return:
+        """
         with open(self.__default_config_path) as config_file:
             default_settings = json.load(config_file)
         return default_settings.get(name)

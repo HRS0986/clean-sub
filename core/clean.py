@@ -41,6 +41,16 @@ class CleanSub(ABC):
         return duration
 
     def _split_timestamp(self, timestamp: str) -> SplitTimestamp:
+        """
+        Split timestamp into starting and ending timestamp. Each of these are split into
+            - Hours
+            - Minutes
+            - Seconds
+            - Milliseconds
+
+        :param timestamp: Timestamp to split
+        :return: A dictionary like this -> {'start': [H, MM, SS.MS], 'end': [H, MM, SS.MS]}
+        """
         start, end, sec_separator = '', '', ','
         if self.filetype == 'srt':
             start, end = timestamp.split(' --> ')
@@ -74,6 +84,10 @@ class CleanSub(ABC):
         return self._unwanted_content
 
     def detect_unwanted_by_content(self):
+        """
+        Detect unwanted content in the subtitle file by checking special keywords
+        :return:
+        """
         after_content: ContentList = []
         for content in self._extracted_sub_content:
             sub_content = ' '.join(content['content']) if self.filetype == 'srt' else content['content']
@@ -86,6 +100,10 @@ class CleanSub(ABC):
         self._extracted_sub_content = after_content
 
     def detect_unwanted_by_duration(self):
+        """
+       Detect unwanted content in the subtitle file by checking subtitle's display duration
+       :return:
+       """
         after_duration: ContentList = []
         for content in self._extracted_sub_content:
             split_timestamp: SplitTimestamp = self._split_timestamp(content['timestamp'])
@@ -101,6 +119,11 @@ class CleanSub(ABC):
         self._extracted_sub_content = after_duration
 
     def remove_unwanted(self, content_to_remove: ContentList):
+        """
+        Remove provided unwanted content from the subtitle file's content
+        :param content_to_remove: List of contents to remove from subtitle file
+        :return:
+        """
         for content in self._extracted_full_content:
             if content in content_to_remove:
                 content_to_remove.remove(content)

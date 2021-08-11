@@ -20,6 +20,12 @@ class CleanSubASS(CleanSub):
         self.__FONTS_REGEX: Pattern[str] = re.compile(self.__FONTS_PATTERN)
 
     def extract_subtitles(self):
+        """
+        Read and split subtitle file's content into
+            - subtitle content
+            - script information
+            - empty subtitle lines
+        """
         with open(self._sub_file_path, 'r', encoding='utf8') as sub_file:
             sub_lines = sub_file.readlines()
             for line in sub_lines:
@@ -62,6 +68,9 @@ class CleanSubASS(CleanSub):
         return filename
 
     def remove_graphics_and_fonts(self):
+        """
+        Remove [GRAPHICS] section and [FONT] section in ass file
+        """
         info_str: str = ''.join(self._info_content)
 
         # Replace graphics content and font content with "" 

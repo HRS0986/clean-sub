@@ -1,4 +1,4 @@
-from typing import List, Dict, Mapping, Tuple, Union, Literal, Optional
+from typing import List, Dict, Mapping, Tuple, Union, Optional
 
 ContentList = List[Mapping[str, Union[str, List[str]]]]
 SplitTimestamp = Dict[str, List[Union[int, float]]]
