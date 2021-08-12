@@ -67,15 +67,15 @@ def select_to_remove(unwanted_content: ContentList, filetype: str) -> list:
     return answers_2
 
 
-def clean_sub_file(unwanted_content: ContentList, cleaner: Cleaner, selected: list):
+def clean_sub_file(unwanted_content: ContentList, cleaner: Cleaner, selected_unwanted: list):
     """
     Remove unwanted content from subtitle file's content
     :param unwanted_content: Detected unwanted content fom subtitle file's content
     :param cleaner: Cleaner object
-    :param selected: Content to remove among unwanted_content from subtitle file's content
+    :param selected_unwanted: Content to remove among unwanted_content from subtitle file's content
     """
     to_remove: ContentList = []
-    for sub in selected:
+    for sub in selected_unwanted:
         timestamp = sub.split(' :- ')[0]
         for content in unwanted_content:
             if content['timestamp'] == timestamp:

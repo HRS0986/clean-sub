@@ -8,7 +8,7 @@ SETTINGS = (
     ('remove_empty', 'REMOVE_EMPTY'),
     ('new_sub_file', 'CREATE_NEW_FILE'),
     ('keywords', 'KEYWORDS'),
-    (None, 'FILETYPES')
+    (None, 'FILE_TYPES')
 )
 
 
@@ -24,6 +24,7 @@ class ConfigHandler:
             keep_empty: bool,
             min_d: Optional[float] = None,
             max_d: Optional[float] = None,
+            script_save_name: Optional[str] = None,
             script_name: Optional[str] = None,
             new_file: Optional[bool] = None,
             ext_file: Optional[bool] = None,
@@ -31,11 +32,12 @@ class ConfigHandler:
             keywords_a: Optional[List[str]] = None,
             keywords_e: Optional[List[str]] = None
     ):
-        self.__script_name = script_name
         self.filtype = filtype
+        self.sub_path = sub_path
+        self.__script_save_name = script_save_name
+        self.__script_name = script_name
         self.__new_file = new_file
         self.__ext_file = ext_file
-        self.sub_path = sub_path
         self.__no_empty = no_empty
         self.__keep_empty = keep_empty
         self.__max = max_d
@@ -44,16 +46,22 @@ class ConfigHandler:
         self.__keywords_a = keywords_a
         self.__keywords_e = keywords_e
         self.__default_config_path = r'config/default_config.json'
+        self.__config_script_dir = r'config/custom_configurations/'
 
-    def __get_setting(self, name: str) -> Configuration:
+    def __get_setting(self, setting_name: str) -> Configuration:
         """
         Return a default setting value the from default configuration file
-        :param name: Setting name to get the from default configuration file
+        :param setting_name: Setting name to get the from default configuration file
         :return:
         """
-        with open(self.__default_config_path) as config_file:
+        if self.__script_name:
+            script_path = f'{self.__config_script_dir}{self.__script_name}.json'
+        else:
+            script_path = self.__default_config_path
+
+        with open(script_path) as config_file:
             default_settings = json.load(config_file)
-        return default_settings.get(name)
+        return default_settings.get(setting_name)
 
     @property
     def min(self):
@@ -102,8 +110,8 @@ class ConfigHandler:
 
     def write_configuration_script(self):
         # TODO: Write sinhala keywords
-        if self.__script_name:
-            save_path = f'config/custom_configurations/{self.__script_name}.json'
+        if self.__script_save_name:
+            save_path = f'config/custom_configurations/{self.__script_save_name}.json'
             configurations = {}
             for setting in SETTINGS:
                 setting_name = setting[1]
