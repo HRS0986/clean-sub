@@ -1,8 +1,8 @@
 import re
-
-from config.config import ConfigHandler
 from abc import abstractmethod, ABC
 from typing import List, Union, Pattern
+
+from config.config import ConfigHandler
 from dtypes import ContentList, SplitTimestamp
 
 

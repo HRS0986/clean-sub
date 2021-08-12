@@ -1,13 +1,14 @@
 import os
 from typing import Tuple, Union
-from colorama import init, Fore
+
 from PyInquirer import prompt
+from colorama import init, Fore
 
 from config.config import ConfigHandler
-from dtypes import ContentList
 from core.ass import CleanSubASS
 from core.smi import CleanSubSmi
 from core.srt import CleanSubSRT
+from dtypes import ContentList
 
 if os.name == "posix":
     init()

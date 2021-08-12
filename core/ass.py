@@ -1,9 +1,8 @@
 import re
+from typing import List, Pattern
 
 from config.config import ConfigHandler
-from typing import List, Pattern
-from dtypes import ASSSubPart
-from dtypes import ASSRegexResults
+from dtypes import ASSSubPart, ASSRegexResults
 from .clean import CleanSub
 
 

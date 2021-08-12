@@ -18,19 +18,19 @@ class ConfigHandler:
     """
     def __init__(
             self,
-            sub_path: str,
-            filtype: str,
-            no_empty: bool,
-            keep_empty: bool,
-            min_d: Optional[float] = None,
-            max_d: Optional[float] = None,
-            script_save_name: Optional[str] = None,
-            script_name: Optional[str] = None,
-            new_file: Optional[bool] = None,
-            ext_file: Optional[bool] = None,
-            keywords_o: Optional[List[str]] = None,
-            keywords_a: Optional[List[str]] = None,
-            keywords_e: Optional[List[str]] = None
+            sub_path: str,                              # Subtitle file path
+            filtype: str,                               # Subtitle file type (srt or ass or smi)
+            no_empty: bool,                             # Remove empty lines status
+            keep_empty: bool,                           # Keep empty lines status
+            min_d: Optional[float] = None,              # Minimum display duration to check
+            max_d: Optional[float] = None,              # Maximum display duration to check
+            script_save_name: Optional[str] = None,     # Settings script save path
+            script_name: Optional[str] = None,          # Setting script path to use
+            new_file: Optional[bool] = None,            # Create new cleaned subtitle file status
+            ext_file: Optional[bool] = None,            # Modify current subtitle file without creating new files status
+            keywords_o: Optional[List[str]] = None,     # Keyword to check. Check Only these keywords
+            keywords_a: Optional[List[str]] = None,     # Additional keywords to check with default keywords list
+            keywords_e: Optional[List[str]] = None      # Exclude these keywords from default keywords list
     ):
         self.filtype = filtype
         self.sub_path = sub_path
@@ -109,7 +109,6 @@ class ConfigHandler:
         return keywords
 
     def write_configuration_script(self):
-        # TODO: Write sinhala keywords
         if self.__script_save_name:
             save_path = f'config/custom_configurations/{self.__script_save_name}.json'
             configurations = {}
@@ -121,7 +120,7 @@ class ConfigHandler:
                     setting_value = self.__get_setting(setting_name)
                 configurations[setting_name] = setting_value
             with open(save_path, 'w', encoding='utf8') as configuration_file:
-                json.dump(configurations, configuration_file, indent=4)
+                json.dump(configurations, configuration_file, indent=4, ensure_ascii=False)
 
         else:
             raise Exception('Configuration script path is not provided')

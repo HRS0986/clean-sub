@@ -2,8 +2,7 @@ import re
 from typing import Dict
 
 from config.config import ConfigHandler
-from dtypes import SMISubPart
-from dtypes import SMIRegexResults
+from dtypes import SMISubPart, SMIRegexResults
 from .clean import CleanSub
 
 

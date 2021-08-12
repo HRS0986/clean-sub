@@ -1,14 +1,16 @@
+import json
 import os
 from argparse import ArgumentParser
+from pathlib import Path
 
 from PyInquirer import prompt
 from mypy.api import Tuple
 from prompt_toolkit.validation import Validator, ValidationError
 
 from cleanUI import execute
-from pathlib import Path
 from config.config import ConfigHandler
-from config.default_config import FILE_TYPES
+
+DEFAULT_CONFIGURATIONS_PATH = r'config/default_config.json'
 
 
 class PathValidator(Validator):
@@ -16,6 +18,9 @@ class PathValidator(Validator):
     Validator for validate user entered subtitle file's path
     """
     def validate(self, document):
+        with open(DEFAULT_CONFIGURATIONS_PATH) as config_file:
+            default_settings = json.load(config_file)
+            FILE_TYPES = default_settings.get("FILE_TYPES")
         valid_path: bool = os.path.isfile(document.text)
         valid_type: bool = document.text[-3:] in FILE_TYPES
         if not valid_path:
