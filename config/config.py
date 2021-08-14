@@ -59,7 +59,7 @@ class ConfigHandler:
         else:
             script_path = self.__default_config_path
 
-        with open(script_path) as config_file:
+        with open(script_path, encoding="utf8") as config_file:
             default_settings = json.load(config_file)
         return default_settings.get(setting_name)
 

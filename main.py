@@ -62,7 +62,7 @@ if __name__ == '__main__':
     )
     parser.add_argument('-m', '--max', help="Maximum subtitle display duration to check", type=int, dest="MAX")
     parser.add_argument('-n', '--min', help="Minimum subtitle display duration to check", type=int, dest="MIN")
-    parser.add_argument('-f', '--file', help="Subtitle file path", type=Path, dest="FILE")
+    parser.add_argument('-f', '--file', help="Subtitle file path", type=str, dest="FILE")
     parser.add_argument('-k', '--keywords', help="Keywords checklist (Comma Separated)", type=str, dest="K", nargs="+")
     parser.add_argument('-r', '--exc', help="Keywords to exclude from default list (Comma Separated)", type=str, dest="EX_K", nargs="+")
     parser.add_argument('-a', '--add', help="Keywords to add default list (Comma Separated)", type=str, dest="ADD_K", nargs="+")

@@ -8,12 +8,12 @@ from dtypes import ContentList, SplitTimestamp
 
 class CleanSub(ABC):
     def __init__(self, content_pattern: str, config_handler: ConfigHandler):
+        self._config_handler = config_handler
         self._sub_file_path = self._config_handler.sub_path
         self._extracted_sub_content: ContentList = []
         self._extracted_full_content: ContentList = []
         self._unwanted_content: ContentList = []
-        self._content_to_write: ContentList = []
-        self._config_handler = config_handler
+        self._content_to_write: ContentList = []        
         self.filetype = self._config_handler.filtype
         self.__CONTENT_PATTERN = content_pattern
         self._CONTENT_REGEX: Pattern[str] = re.compile(self.__CONTENT_PATTERN)
