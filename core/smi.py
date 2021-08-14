@@ -1,14 +1,15 @@
 import re
 from typing import Dict
-from .dtypes import SMISubPart
-from .dtypes import SMIRegexResults
+
+from config.config import ConfigHandler
+from dtypes import SMISubPart, SMIRegexResults
 from .clean import CleanSub
 
 
 class CleanSubSmi(CleanSub):
-    def __init__(self, sub_file_path: str):
+    def __init__(self, config_handler: ConfigHandler):
         SMI_CONTENT_PATTERN = r"(<SYNC.+)\n(.+)\n(<SYNC .+?nbsp)"
-        super(CleanSubSmi, self).__init__(sub_file_path, 'smi', SMI_CONTENT_PATTERN)
+        super(CleanSubSmi, self).__init__(SMI_CONTENT_PATTERN, config_handler)
         self._info_content: Dict[str, str] = {"head": "", "tale": "\n</BODY>\n</SAMI>"}
         self.__INFO_HEAD_PATTERN = r"<SAMI>.+<BODY>\n"
         self.__TIMESTAMP_PATTERN = r"Start=(\d+?)>"
@@ -16,6 +17,9 @@ class CleanSubSmi(CleanSub):
         self.__TIMESTAMP_REGEX = re.compile(self.__TIMESTAMP_PATTERN)
 
     def extract_subtitles(self):
+        """
+        Read and split subtitle file's content
+        """
         with open(self._sub_file_path, 'r', encoding='utf16', errors='ignore') as sub_file:
             sub_content: str = sub_file.read()
             content_results: SMIRegexResults = self._CONTENT_REGEX.findall(sub_content)

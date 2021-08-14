@@ -1,25 +1,27 @@
 import re
-from .config import MIN_DURATION, MAX_DURATION, KEYWORDS, CREATE_NEW_FILE
 from abc import abstractmethod, ABC
 from typing import List, Union, Pattern
-from .dtypes import ContentList, SplitTimestamp
+
+from config.config import ConfigHandler
+from dtypes import ContentList, SplitTimestamp
 
 
 class CleanSub(ABC):
-    def __init__(self, sub_file_path: str, filetype: str, content_pattern: str):
-        self._sub_file_path = sub_file_path
+    def __init__(self, content_pattern: str, config_handler: ConfigHandler):
+        self._config_handler = config_handler
+        self._sub_file_path = self._config_handler.sub_path
         self._extracted_sub_content: ContentList = []
         self._extracted_full_content: ContentList = []
         self._unwanted_content: ContentList = []
-        self._content_to_write: ContentList = []
-        self.filetype = filetype
+        self._content_to_write: ContentList = []        
+        self.filetype = self._config_handler.filtype
         self.__CONTENT_PATTERN = content_pattern
         self._CONTENT_REGEX: Pattern[str] = re.compile(self.__CONTENT_PATTERN)
 
     def _calculate_duration(self, start: List[int], end: List[int]) -> float:
-        '''
+        """
         Calculate subtitle's display duration
-        '''
+        """
         duration = 0.000
         s_seconds, s_minutes, s_hours = start[-1], start[1], start[0]
         e_seconds, e_minutes, e_hours = end[-1], end[1], end[0]
@@ -39,6 +41,16 @@ class CleanSub(ABC):
         return duration
 
     def _split_timestamp(self, timestamp: str) -> SplitTimestamp:
+        """
+        Split timestamp into starting and ending timestamp. Each of these are split into
+            - Hours
+            - Minutes
+            - Seconds
+            - Milliseconds
+
+        :param timestamp: Timestamp to split
+        :return: A dictionary like this -> {'start': [H, MM, SS.MS], 'end': [H, MM, SS.MS]}
+        """
         start, end, sec_separator = '', '', ','
         if self.filetype == 'srt':
             start, end = timestamp.split(' --> ')
@@ -72,10 +84,14 @@ class CleanSub(ABC):
         return self._unwanted_content
 
     def detect_unwanted_by_content(self):
+        """
+        Detect unwanted content in the subtitle file by checking special keywords
+        :return:
+        """
         after_content: ContentList = []
         for content in self._extracted_sub_content:
             sub_content = ' '.join(content['content']) if self.filetype == 'srt' else content['content']
-            for keyword in KEYWORDS:
+            for keyword in self._config_handler.keywords:
                 if keyword in sub_content:
                     self._unwanted_content.append(content)
                     break
@@ -84,21 +100,30 @@ class CleanSub(ABC):
         self._extracted_sub_content = after_content
 
     def detect_unwanted_by_duration(self):
+        """
+       Detect unwanted content in the subtitle file by checking subtitle's display duration
+       :return:
+       """
         after_duration: ContentList = []
         for content in self._extracted_sub_content:
             split_timestamp: SplitTimestamp = self._split_timestamp(content['timestamp'])
             start: List[Union[int, float]] = split_timestamp['start']
             end: List[Union[int, float]] = split_timestamp['end']
             duration = self._calculate_duration(start, end)
-            if duration <= MIN_DURATION:
+            if duration <= self._config_handler.min:
                 self._unwanted_content.append(content)
-            elif duration >= MAX_DURATION:
+            elif duration >= self._config_handler.max:
                 self._unwanted_content.append(content)
             else:
                 after_duration.append(content)
         self._extracted_sub_content = after_duration
 
     def remove_unwanted(self, content_to_remove: ContentList):
+        """
+        Remove provided unwanted content from the subtitle file's content
+        :param content_to_remove: List of contents to remove from subtitle file
+        :return:
+        """
         for content in self._extracted_full_content:
             if content in content_to_remove:
                 content_to_remove.remove(content)
@@ -106,10 +131,10 @@ class CleanSub(ABC):
             self._content_to_write.append(content)
 
     def _get_file_name(self) -> str:
-        '''
+        """
         Return new subtitle file's name
-        '''
-        if CREATE_NEW_FILE:
+        """
+        if self._config_handler.new_sub_file:
             return f'{self._sub_file_path[:-4]}-NEW.{self.filetype}'
         else:
             return self._sub_file_path

@@ -1,15 +1,15 @@
 import re
-from .config import REMOVE_EMPTY
 from typing import List, Pattern
-from .dtypes import ASSSubPart
-from .dtypes import ASSRegexResults
+
+from config.config import ConfigHandler
+from dtypes import ASSSubPart, ASSRegexResults
 from .clean import CleanSub
 
 
 class CleanSubASS(CleanSub):
-    def __init__(self, sub_file_path: str):
+    def __init__(self, config_handler: ConfigHandler):
         ASS_CONTENT_PATTERN = r'(D.+: \d,)(\d:\d\d:\d\d\.\d{2,3},\d:\d\d:\d\d\.\d{2,3})(,\w+,.*,\d,\d,\d,.*?,)(.+)'
-        super(CleanSubASS, self).__init__(sub_file_path, 'ass', ASS_CONTENT_PATTERN)
+        super(CleanSubASS, self).__init__(ASS_CONTENT_PATTERN, config_handler)
         self._info_content: List[str] = []
         self.__EMPTY_PATTERN = r'(D.+: \d,)(\d:\d\d:\d\d\.\d{2,3},\d:\d\d:\d\d\.\d{2,3})(,\w+,.*,\d,\d,\d,.*,)$'
         self.__GRAPHICS_PATTERN = r'\[Graphics\]\n(.+\n)*'
@@ -18,7 +18,13 @@ class CleanSubASS(CleanSub):
         self.__GRAPHICS_REGEX: Pattern[str] = re.compile(self.__GRAPHICS_PATTERN)
         self.__FONTS_REGEX: Pattern[str] = re.compile(self.__FONTS_PATTERN)
 
-    def extract_subtitles(self, remove_empty: bool = REMOVE_EMPTY):
+    def extract_subtitles(self):
+        """
+        Read and split subtitle file's content into
+            - subtitle content
+            - script information
+            - empty subtitle lines
+        """
         with open(self._sub_file_path, 'r', encoding='utf8') as sub_file:
             sub_lines = sub_file.readlines()
             for line in sub_lines:
@@ -35,7 +41,7 @@ class CleanSubASS(CleanSub):
                 else:
                     # Extract empty content Lines
                     if self.__EMPTY_REGEX.match(line):
-                        if not remove_empty:
+                        if not self._config_handler.remove_empty:
                             info_content: ASSRegexResults = self.__EMPTY_REGEX.findall(line)[0]
                             info_part: ASSSubPart = {
                                 "part_1": info_content[0],
@@ -61,6 +67,9 @@ class CleanSubASS(CleanSub):
         return filename
 
     def remove_graphics_and_fonts(self):
+        """
+        Remove [GRAPHICS] section and [FONT] section in ass file
+        """
         info_str: str = ''.join(self._info_content)
 
         # Replace graphics content and font content with "" 
@@ -69,7 +78,7 @@ class CleanSubASS(CleanSub):
         if self.__FONTS_REGEX.search(info_str):
             info_str = self.__FONTS_REGEX.sub("", info_str)
 
-        # Remove graphics content and font content in ASS file's infomation content part
+        # Remove graphics content and font content in ASS file's information content part
         info: List[str] = info_str.split('\n')
         for line in info[::-1]:
             if len(line) == 0:
