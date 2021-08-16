@@ -8,7 +8,7 @@ from .clean import CleanSub
 
 class CleanSubASS(CleanSub):
     def __init__(self, config_handler: ConfigHandler):
-        ASS_CONTENT_PATTERN = r'(D.+: \d,)(\d:\d\d:\d\d\.\d{2,3},\d:\d\d:\d\d\.\d{2,3})(,\w+,.*,\d,\d,\d,.*?,)(.+)'
+        ASS_CONTENT_PATTERN = r'(D.+: \d,)(\d:\d\d:\d\d\.\d{2,3},\d:\d\d:\d\d\.\d{2,3})(,[\w ]+,.*,\d,\d,\d,.*?,)(.+)'
         super(CleanSubASS, self).__init__(ASS_CONTENT_PATTERN, config_handler)
         self._info_content: List[str] = []
         self.__EMPTY_PATTERN = r'(D.+: \d,)(\d:\d\d:\d\d\.\d{2,3},\d:\d\d:\d\d\.\d{2,3})(,\w+,.*,\d,\d,\d,.*,)$'
